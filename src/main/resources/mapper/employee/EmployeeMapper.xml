@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.logitics.erp.employee.mapper.EmployeeMapper">
+
+    <select id="getTest"
+        parameterType="SearchEmployeeRequest"
+        resultType="EmployeeListResponse">
+    >
+        select *
+        from employee e
+        left join employee_military
+
+    </select>
+
+    <select id="getEmployees"
+        resultType="EmployeeListResponse"
+    >
+        select e.*
+        from employee e
+        where 1=1
+        <if test="request.employeeNo != null and request.employeeNo != ''">
+            AND e.employee_no = #{request.employeeNo}
+        </if>
+
+        <if test="request.name != null and request.name != ''">
+            AND e.name = #{request.name}
+        </if>
+
+        limit #{size} offset #{offset}
+    </select>
+
+
+</mapper>
