@@ -12,7 +12,7 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @NoArgsConstructor
 public class EmployeeCareerAddInfoRequest {
-	private String employeeNo;
+	private Long employeeId;
 
 	private String companyName;
 

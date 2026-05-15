@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface EmployeeCareerMapper {
 
-	public List<EmployeeCareerInfoResponse> getEmployeeCareerInfo(@Param("employeeNo") String employeeNo);
+	public List<EmployeeCareerInfoResponse> getEmployeeCareerInfo(@Param("employeeNo") Long employeeId);
 	public List<EmployeeCareerInfoResponse> addInfo(@Param("r") EmployeeCareerAddInfoRequest addRequest);
-
+	public List<EmployeeCareerInfoResponse> deleteInfo(@Param("deleteCareerId") Long deleteCareerId);
 }

@@ -17,14 +17,23 @@ public class EmployeeCareerController {
 	private final EmployeeCareerService employeeCareerService;
 
 	@GetMapping
-	public List<EmployeeCareerInfoResponse> getEmployeeCareerInfo(@RequestParam String employeeNo) {
-		return employeeCareerService.getEmployeeCareerInfo(employeeNo);
+	public List<EmployeeCareerInfoResponse> getEmployeeCareerInfo(@RequestParam Long employeeId) {
+		return employeeCareerService.getEmployeeCareerInfo(employeeId);
 	}
 
-	@PostMapping("/addInfo")
-	@Operation(summary = "행추가", description = "행추가")
-	public List<EmployeeCareerInfoResponse> addInfo(@RequestBody EmployeeCareerAddInfoRequest addRequest) {
+	@PostMapping
+	@Operation(summary = "경력 추가", description = "직원 경력 정보 추가")
+	public List<EmployeeCareerInfoResponse> addInfo(
+					@RequestBody EmployeeCareerAddInfoRequest addRequest
+	) {
 		return employeeCareerService.addInfo(addRequest);
+	}
+	@DeleteMapping("/{careerId}")
+	@Operation(summary = "경력 삭제", description = "직원 경력 정보 삭제")
+	public List<EmployeeCareerInfoResponse> deleteInfo(
+					@PathVariable Long careerId
+	) {
+		return employeeCareerService.deleteInfo(careerId);
 	}
 
 }

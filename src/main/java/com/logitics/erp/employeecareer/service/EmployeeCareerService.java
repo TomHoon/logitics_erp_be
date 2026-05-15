@@ -14,11 +14,17 @@ public class EmployeeCareerService {
 
 	private final EmployeeCareerMapper employeeCareerMapper;
 
-	public List<EmployeeCareerInfoResponse> getEmployeeCareerInfo(String employeeNo) {
-		return employeeCareerMapper.getEmployeeCareerInfo(employeeNo);
+	public List<EmployeeCareerInfoResponse> getEmployeeCareerInfo(Long employeeId) {
+		return employeeCareerMapper.getEmployeeCareerInfo(employeeId);
 	}
 
 	public List<EmployeeCareerInfoResponse> addInfo(EmployeeCareerAddInfoRequest addRequest) {
 		return employeeCareerMapper.addInfo(addRequest);
 	}
+
+	public List<EmployeeCareerInfoResponse> deleteInfo(Long deleteCareerId) {
+		return employeeCareerMapper.deleteInfo(deleteCareerId);
+	}
+
+
 }
