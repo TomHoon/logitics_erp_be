@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.logitics.erp.attendance.mapper.AttendanceMapper">
+
+    <select id="getMonthAttendance">
+        SELECT a.*
+        FROM attendance a
+            LEFT JOIN employee e
+                ON a.employee_id = e.employee_id
+            LEFT JOIN department d
+                ON d.department_id = e.department_id
+        WHERE 1=1
+
+        <if test="departmentId != null">
+            AND d.department_id = #{departmentId}
+        </if>
+
+        AND a.work_date >= #{startDate}
+        AND a.work_date &lt; #{endDate}
+
+        LIMIT #{size} OFFSET #{offset}
+    </select>
+
+<!--    <insert-->
+<!--        id="addInfo"-->
+<!--        parameterType="EmployeeCareerAddInfoRequest"-->
+<!--    >-->
+<!--        INSERT INTO employee_career(-->
+<!--            employee_id,-->
+<!--            company_name,-->
+<!--            hire_date,-->
+<!--            resignation_date,-->
+<!--            position_name,-->
+<!--            department_name,-->
+<!--            resignation_reason-->
+<!--        )-->
+<!--        VALUES (-->
+<!--            #{employeeId},-->
+<!--            #{companyName},-->
+<!--            #{hireDate},-->
+<!--            #{resignationDate},-->
+<!--            #{positionName},-->
+<!--            #{departmentName},-->
+<!--            #{resignationReason}-->
+<!--        )-->
+<!--    </insert>-->
+
+
+<!--    <update id="deleteInfo">-->
+<!--        UPDATE employee_career ec-->
+<!--            SET ec.deleted = true-->
+<!--            WHERE ec.employee_career_id = #{deletedCareerId}-->
+<!--    </update>-->
+
+
+</mapper>

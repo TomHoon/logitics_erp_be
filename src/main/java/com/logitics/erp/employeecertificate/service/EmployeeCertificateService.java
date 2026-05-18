@@ -21,16 +21,16 @@ public class EmployeeCertificateService {
 
 	private final EmployeeCertificateMapper employeeCertificateMapper;
 
-	public List<EmployeeCertificateInfoResponse> getEmployeeCertificateInfo(String employeeNo) {
-		return employeeCertificateMapper.getEmployeeCertificateInfo(employeeNo);
+	public List<EmployeeCertificateInfoResponse> getEmployeeCertificateInfo(Long employeeId) {
+		return employeeCertificateMapper.getEmployeeCertificateInfo(employeeId);
 	}
 
-	public List<EmployeeCareerInfoResponse> addCertificateInfo(EmployeeCareerAddInfoRequest addRequest) {
-		return employeeCertificateMapper.addCertificateInfo(addRequest);
+	public boolean addCertificateInfo(EmployeeCertificateAddInfoRequest addRequest) {
+		return employeeCertificateMapper.addCertificateInfo(addRequest) > 0;
 	}
 
-	public List<EmployeeCareerInfoResponse> v(Long deleteCareerId) {
-		return employeeCertificateMapper.deleteCertificateInfo(deleteCareerId);
+	public boolean deleteCertificateInfo(Long deleteCareerId) {
+		return employeeCertificateMapper.deleteCertificateInfo(deleteCareerId) > 0;
 	}
 
 }

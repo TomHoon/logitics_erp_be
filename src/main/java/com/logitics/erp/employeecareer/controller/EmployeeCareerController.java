@@ -23,14 +23,14 @@ public class EmployeeCareerController {
 
 	@PostMapping
 	@Operation(summary = "경력 추가", description = "직원 경력 정보 추가")
-	public List<EmployeeCareerInfoResponse> addInfo(
+	public boolean addInfo(
 					@RequestBody EmployeeCareerAddInfoRequest addRequest
 	) {
 		return employeeCareerService.addInfo(addRequest);
 	}
 	@DeleteMapping("/{careerId}")
 	@Operation(summary = "경력 삭제", description = "직원 경력 정보 삭제")
-	public List<EmployeeCareerInfoResponse> deleteInfo(
+	public boolean deleteInfo(
 					@PathVariable Long careerId
 	) {
 		return employeeCareerService.deleteInfo(careerId);

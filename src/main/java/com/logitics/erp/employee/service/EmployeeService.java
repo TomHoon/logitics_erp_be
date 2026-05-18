@@ -9,15 +9,8 @@ import com.logitics.erp.employee.dto.SearchEmployeeRequest;
 import com.logitics.erp.employee.entity.Employee;
 import com.logitics.erp.employee.mapper.EmployeeMapper;
 import com.logitics.erp.employee.repository.EmployeeRepository;
-import com.logitics.erp.employeecareer.entity.EmployeeCareer;
-import com.logitics.erp.employeecertificate.entity.EmployeeCertificate;
-import com.logitics.erp.employeeeducation.entity.EmployeeEducation;
-import com.logitics.erp.employeefamily.entity.EmployeeFamily;
-import com.logitics.erp.employeelanguage.entity.EmployeeLanguage;
-import com.logitics.erp.employeemilitary.entity.EmployeeMilitary;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;

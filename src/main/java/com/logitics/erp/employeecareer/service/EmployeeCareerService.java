@@ -18,12 +18,12 @@ public class EmployeeCareerService {
 		return employeeCareerMapper.getEmployeeCareerInfo(employeeId);
 	}
 
-	public List<EmployeeCareerInfoResponse> addInfo(EmployeeCareerAddInfoRequest addRequest) {
-		return employeeCareerMapper.addInfo(addRequest);
+	public boolean addInfo(EmployeeCareerAddInfoRequest addRequest) {
+		return employeeCareerMapper.addInfo(addRequest) > 0;
 	}
 
-	public List<EmployeeCareerInfoResponse> deleteInfo(Long deleteCareerId) {
-		return employeeCareerMapper.deleteInfo(deleteCareerId);
+	public boolean deleteInfo(Long deleteCareerId) {
+		return employeeCareerMapper.deleteInfo(deleteCareerId) > 0;
 	}
 
 

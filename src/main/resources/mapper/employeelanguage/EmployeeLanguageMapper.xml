@@ -5,7 +5,7 @@
 <mapper namespace="com.logitics.erp.employeelanguage.mapper.EmployeeLanguageMapper">
 
     <select id="getEmployeeLanguageInfo"
-        resultType="EmployeeLanguageInfo"
+        resultType="EmployeeLanguageInfoResponse"
     >
         SELECT * FROM employee_language el
         WHERE el.employee_id =
@@ -13,5 +13,33 @@
 
     </select>
 
+
+    <insert id="addEmployeeLanguageInfo">
+        INSERT INTO employee_language(
+            languageName,
+            readingLevel,
+            writingLevel,
+            speakingLevel,
+            testName,
+            testScore,
+            issuedDate,
+            issuer
+        ) VALUES (
+            #{languageName},
+            #{readingLevel},
+            #{writingLevel},
+            #{speakingLevel},
+            #{testName},
+            #{testScore},
+            #{issuedDate},
+            #{issuer},
+        )
+    </insert>
+
+    <update id="deleteEmployeeLanguageInfo">
+        update employee_language el
+        set delete = true
+        where el.employee_language_id = #{languageId}
+    </update>
 
 </mapper>

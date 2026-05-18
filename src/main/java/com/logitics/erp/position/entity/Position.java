@@ -12,6 +12,12 @@ import lombok.NoArgsConstructor;
 @Getter
 @Table(name = "positions")
 public class Position extends BaseEntity {
+
+	public Position(String positionName, Integer positionLevel) {
+		this.positionName = positionName;
+		this.positionLevel = positionLevel;
+	}
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long positionId;

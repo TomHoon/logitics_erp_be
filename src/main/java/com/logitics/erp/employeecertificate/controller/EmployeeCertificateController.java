@@ -35,7 +35,7 @@ public class EmployeeCertificateController {
 
 	@PostMapping
 	@Operation(summary = "자격증 추가", description = "직원 자격증 정보 추가")
-	public List<EmployeeCertificateInfoResponse> addInfo(
+	public boolean addInfo(
 					@RequestBody EmployeeCertificateAddInfoRequest addRequest
 	) {
 		return employeeCertificateService.addCertificateInfo(addRequest);
@@ -43,7 +43,7 @@ public class EmployeeCertificateController {
 
 	@DeleteMapping("/{certificateId}")
 	@Operation(summary = "자격증 삭제", description = "직원 자격증 정보 삭제")
-	public List<EmployeeCertificateInfoResponse> deleteInfo(
+	public boolean deleteInfo(
 					@PathVariable Long certificateId
 	) {
 		return employeeCertificateService.deleteCertificateInfo(certificateId);

@@ -1,5 +1,6 @@
 package com.logitics.erp.employeeeducation.service;
 
+import com.logitics.erp.employeeeducation.dto.EmployeeEducationInfoRequest;
 import com.logitics.erp.employeeeducation.dto.EmployeeEducationInfoResponse;
 import com.logitics.erp.employeeeducation.mapper.EmployeeEducationMapper;
 import com.logitics.erp.employeeeducation.repository.EmployeeEducationRepository;
@@ -19,4 +20,11 @@ public class EmployeeEducationService {
 		return employeeEducationMapper.getEmployeeEducationInfo(employeeNo);
 	}
 
+	public boolean addEmployeeEducationInfo(EmployeeEducationInfoRequest educationInfoRequest) {
+		return employeeEducationMapper.addEmployeeEducationInfo(educationInfoRequest) > 0;
+	}
+
+	public boolean deleteEmployeeEducationInfo(Long educationId) {
+		return employeeEducationMapper.deleteEmployeeEducationInfo(educationId) > 0;
+	}
 }

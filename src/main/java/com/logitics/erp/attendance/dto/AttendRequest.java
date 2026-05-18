@@ -12,5 +12,6 @@ public class AttendRequest {
 	private LocalDateTime checkInTime;
 	private Integer workMinutes;
 	private String attendanceStatusCode;
+	private String memo;
 
 }

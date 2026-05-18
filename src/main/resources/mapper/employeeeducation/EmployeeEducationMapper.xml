@@ -13,5 +13,27 @@
 
     </select>
 
-
+    <insert id="addEmployeeEducationInfo"
+        parameterType="EmployeeEducationInfoRequest"
+    >
+        INSERT INTO employee_education (
+            employee_id,
+            entrance_year_month,
+            graduate_year_month,
+            school_name,
+            major_name,
+            degree,
+            graduated,
+            location
+        ) VALUES (
+            #{employeeId},
+            #{entranceYearMonth},
+            #{graduateYearMonth},
+            #{schoolName},
+            #{majorName},
+            #{degree},
+            #{graduated},
+            #{location}
+        )
+    </insert>
 </mapper>

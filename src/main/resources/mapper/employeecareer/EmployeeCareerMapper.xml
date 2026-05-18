@@ -5,7 +5,7 @@
 <mapper namespace="com.logitics.erp.employeecareer.mapper.EmployeeCareerMapper">
 
     <select id="getEmployeeCareerInfo"
-        resultType="EmployeeCareerInfo"
+        resultType="EmployeeCareerInfoResponse"
     >
         SELECT * FROM employee_career ec
         WHERE ec.employee_id = #{employeeId}
@@ -22,16 +22,16 @@
             resignation_date,
             position_name,
             department_name,
-            resignation_reason,
+            resignation_reason
         )
         VALUES (
-            #{r.employeeId},
-            #{r.companyName},
-            #{r.hireDate},
-            #{r.resignationDate},
-            #{r.positionName},
-            #{r.departmentName},
-            #{r.resignationReason}
+            #{employeeId},
+            #{companyName},
+            #{hireDate},
+            #{resignationDate},
+            #{positionName},
+            #{departmentName},
+            #{resignationReason}
         )
     </insert>
 

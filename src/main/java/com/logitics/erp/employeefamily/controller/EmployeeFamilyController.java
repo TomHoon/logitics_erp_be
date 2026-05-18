@@ -1,12 +1,10 @@
 package com.logitics.erp.employeefamily.controller;
 
+import com.logitics.erp.employeefamily.dto.EmployeeFamilyInfoRequest;
 import com.logitics.erp.employeefamily.dto.EmployeeFamilyInfoResponse;
 import com.logitics.erp.employeefamily.service.EmployeeFamilyService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -20,6 +18,16 @@ public class EmployeeFamilyController {
 	@GetMapping
 	public List<EmployeeFamilyInfoResponse> getEmployeeFamilyInfo(@RequestParam(required = false) String employeeNo) {
 		return familyService.getEmployeeFamilyInfo(employeeNo);
+	}
+
+	@PostMapping
+	public boolean addFamilyInfo(@RequestBody EmployeeFamilyInfoRequest familyInfoRequest) {
+		return familyService.addFamiliyInfo(familyInfoRequest);
+	}
+
+	@DeleteMapping("/{familyId}")
+	public boolean deleteFamilyInfo(@PathVariable Long familyId) {
+		return familyService.deleteFamilyInfo(familyId);
 	}
 
 }

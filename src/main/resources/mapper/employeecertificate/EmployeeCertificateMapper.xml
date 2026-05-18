@@ -19,22 +19,22 @@
         parameterType="EmployeeCertificateAddInfoRequest"
     >
         INSERT INTO employee_career(
-        employee_id,
-        company_name,
-        hire_date,
-        resignation_date,
-        position_name,
-        department_name,
-        resignation_reason,
+            employee_id,
+            company_name,
+            hire_date,
+            resignation_date,
+            position_name,
+            department_name,
+            resignation_reason
         )
         VALUES (
-        #{r.employeeId},
-        #{r.companyName},
-        #{r.hireDate},
-        #{r.resignationDate},
-        #{r.positionName},
-        #{r.departmentName},
-        #{r.resignationReason}
+            #{employeeId},
+            #{companyName},
+            #{hireDate},
+            #{resignationDate},
+            #{positionName},
+            #{departmentName},
+            #{resignationReason}
         )
     </insert>
 
