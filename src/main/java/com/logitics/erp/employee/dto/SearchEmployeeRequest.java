@@ -5,7 +5,12 @@ import lombok.Data;
 @Data
 public class SearchEmployeeRequest {
 
-	private String employeeNo;
-	private String name;
+	private String keyword;
+	private String departmentName;
+	private String employeeStatusCode;
+	private String positionName;
+
+	private int page = 0;
+	private int size = 10;
 
 }

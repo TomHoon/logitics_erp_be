@@ -36,15 +36,13 @@ public class EmployeeController {
 	@Tag(name = "Employee", description = "사원 관리 API")
 	@Operation(summary = "사원 조회", description = "사원 목록을 조회합니다.")
 	public List<EmployeeListResponse> getEmployees(
-					@RequestParam(name = "page", defaultValue = "0", required = false) int page,
-					@RequestParam(name = "size", defaultValue = "10", required = false) int size,
 					@Parameter(
 									description = "사번/사원명으로조회",
 									example = "이채리1"
 					)
 					SearchEmployeeRequest request
 	) {
-		return employeeService.getEmployees(page, size, request);
+		return employeeService.getEmployees(request);
 	}
 
 	@PostMapping
