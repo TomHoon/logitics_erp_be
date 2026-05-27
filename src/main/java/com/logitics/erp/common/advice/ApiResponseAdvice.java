@@ -19,11 +19,19 @@ public class ApiResponseAdvice implements ResponseBodyAdvice<Object> {
 		// 현재는 모두 true 처리
 //		return !returnType.getContainingClass()
 //						.equals(AuthController.class);
+		String className = returnType.getContainingClass().getName();
+
+		// Swagger 제외
+		if (className.contains("springdoc")) {
+			return false;
+		}
 		return true;
 	}
 
 	@Override
 	public @Nullable Object beforeBodyWrite(@Nullable Object body, MethodParameter returnType, MediaType selectedContentType, Class<? extends HttpMessageConverter<?>> selectedConverterType, ServerHttpRequest request, ServerHttpResponse response) {
+
+
 		if (body instanceof ApiResponse<?>) {
 			return body;
 		}
