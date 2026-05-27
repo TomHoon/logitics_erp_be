@@ -2,6 +2,8 @@ package com.logitics.erp.employee;
 
 import com.logitics.erp.department.entity.Department;
 import com.logitics.erp.department.repository.DepartmentRepository;
+import com.logitics.erp.employee.dto.JoinRequest;
+import com.logitics.erp.employee.dto.LoginRequest;
 import com.logitics.erp.employee.entity.Employee;
 import com.logitics.erp.employee.mapper.EmployeeMapper;
 import com.logitics.erp.employee.repository.EmployeeRepository;
@@ -17,14 +19,19 @@ import com.logitics.erp.employeelanguage.entity.EmployeeLanguage;
 import com.logitics.erp.employeelanguage.repository.EmployeeLanguageRepository;
 import com.logitics.erp.employeemilitary.entity.EmployeeMilitary;
 import com.logitics.erp.employeemilitary.repository.EmployeeMilitaryRepository;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.annotation.Commit;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 @SpringBootTest
 public class EmployeeServiceTests {
@@ -55,6 +62,90 @@ public class EmployeeServiceTests {
 
 	@Autowired
 	private DepartmentRepository departmentRepository;
+
+	@Autowired
+	private PasswordEncoder passwordEncoder;
+
+	@Test
+	@DisplayName("회원가입 데이터 생성")
+	@Commit
+	public void joinEmployee() {
+		record TestUser2(String name, String email) {}
+
+		List<TestUser2> list = List.of(
+						new TestUser2("리흔", "riheun@naver.com"),
+						new TestUser2("주안", "juan@naver.com"),
+						new TestUser2("예린", "yerin@naver.com"),
+						new TestUser2("정민", "jungmin@naver.com"),
+						new TestUser2("민성", "minsung@naver.com"),
+						new TestUser2("하진", "hajin@naver.com")
+		);
+
+		for (TestUser2 user : list) {
+			Employee foundEmployee = employeeRepository.findByEmail(user.email()).orElseThrow();
+			foundEmployee.setPassword(passwordEncoder.encode("1234"));
+			employeeRepository.save(foundEmployee);
+		}
+
+//		JoinRequest joinRequest = JoinRequest.builder()
+////						.lastName()
+//						.name("")
+//						.employeeNo("T" + String.format("%03d", new Random().nextInt(1000)))
+//						.departmentName("")
+//						.email("@naver.com")
+//						.password(passwordEncoder.encode("1234"))
+//						.checkPassword(passwordEncoder.encode("1234"))
+//						.isAgree(true)
+//						.build();
+	}
+
+
+
+	@Test
+	@DisplayName("우리의 데이터 저장")
+	@Commit
+	public void createOurData() {
+		record TestUser(String name, String email) {}
+
+
+		Department department =
+						departmentRepository.findById(31L)
+										.orElseThrow();
+
+		List<TestUser> list = List.of(
+						new TestUser("리흔", "riheun@naver.com"),
+						new TestUser("주안", "juan@naver.com"),
+						new TestUser("예린", "yerin@naver.com"),
+						new TestUser("정민", "jungmin@naver.com"),
+						new TestUser("민성", "minsung@naver.com"),
+						new TestUser("하진", "hajin@naver.com")
+		);
+
+		for (int i = 0; i < list.size(); i++) {
+
+			String employeeNo =
+							"T" + String.format("%04d", i);
+
+			Employee employee = Employee.builder()
+							.employeeNo(employeeNo)
+							.name(list.get(i).name())
+							.birthDate(
+											LocalDate.of(
+															1990 + (i % 10),
+															(i % 12) + 1,
+															(i % 28) + 1
+											)
+							)
+							.email(list.get(i).email())
+							.phone("010-1111-" + String.format("%04d", i))
+							.address("서울시 테스트구 " + i)
+							.employeeStatusCode("재직")
+							.department(department)
+							.build();
+
+			employeeRepository.save(employee);
+		}
+	}
 
 	@Test
 	@DisplayName("사원 30명 테스트 데이터 생성")

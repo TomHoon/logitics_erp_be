@@ -47,4 +47,10 @@ public class Employee extends BaseEntity {
 	@JoinColumn(name = "department_id")
 	private Department department;
 
+	private String password;
+
+	public void setPassword(String password) {
+		this.password = password;
+	}
+
 }

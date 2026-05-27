@@ -1,16 +1,15 @@
 package com.logitics.erp.employee.service;
 
+import com.logitics.erp.common.util.JwtProvider;
 import com.logitics.erp.department.entity.Department;
 import com.logitics.erp.department.repository.DepartmentRepository;
-import com.logitics.erp.employee.dto.CreateEmployeeRequest;
-import com.logitics.erp.employee.dto.CreateEmployeeResponse;
-import com.logitics.erp.employee.dto.EmployeeListResponse;
-import com.logitics.erp.employee.dto.SearchEmployeeRequest;
+import com.logitics.erp.employee.dto.*;
 import com.logitics.erp.employee.entity.Employee;
 import com.logitics.erp.employee.mapper.EmployeeMapper;
 import com.logitics.erp.employee.repository.EmployeeRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -23,6 +22,8 @@ public class EmployeeService {
 	private final EmployeeRepository employeeRepository;
 	private final DepartmentRepository departmentRepository;
 	private final EmployeeMapper employeeMapper;
+	private final JwtProvider jwtProvider;
+	private final PasswordEncoder passwordEncoder;
 
 	public void createEmployeeTest() {
 		Department d = departmentRepository.findById(1L).orElseThrow();
@@ -70,5 +71,31 @@ public class EmployeeService {
 
 	public List<Employee> getTest() {
 		return employeeMapper.getTest();
+	}
+
+	public LoginResponse login(LoginRequest loginRequest) throws Exception {
+		Employee loginEmployee = employeeRepository.findByEmail(loginRequest.getEmail()).orElseThrow();
+		String encryptedPassword = loginEmployee.getPassword();
+		Boolean isSamePassword = passwordEncoder.matches(loginRequest.getPassword(), encryptedPassword);
+
+		if (isSamePassword) {
+			String accessToken = jwtProvider.createToken(loginRequest.getEmail());
+			long expireIn = 1000 * 60 * 30;
+			String name = loginEmployee.getName();
+			String email = loginEmployee.getEmail();
+			String employeeNo = loginEmployee.getEmployeeNo();
+			String departmentName = loginEmployee.getDepartment().getDepartmentName();
+
+			return LoginResponse.builder()
+							.accessToken(accessToken)
+							.name(name)
+							.expireIn(expireIn)
+							.email(email)
+							.employeeNo(employeeNo)
+							.departmentName(departmentName)
+							.build();
+		}
+
+		throw new Exception("올바른 회원 정보가 아닙니다.");
 	}
 }

@@ -1,9 +1,6 @@
 package com.logitics.erp.employee.controller;
 
-import com.logitics.erp.employee.dto.CreateEmployeeRequest;
-import com.logitics.erp.employee.dto.CreateEmployeeResponse;
-import com.logitics.erp.employee.dto.EmployeeListResponse;
-import com.logitics.erp.employee.dto.SearchEmployeeRequest;
+import com.logitics.erp.employee.dto.*;
 import com.logitics.erp.employee.entity.Employee;
 import com.logitics.erp.employee.service.EmployeeService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -21,6 +18,11 @@ import java.util.List;
 public class EmployeeController {
 
 	private final EmployeeService employeeService;
+
+	@PostMapping("/login")
+	public LoginResponse login(@RequestBody LoginRequest loginRequest) throws Exception{
+		return employeeService.login(loginRequest);
+	}
 
 	@GetMapping("/createTest")
 	public void createTest() {
