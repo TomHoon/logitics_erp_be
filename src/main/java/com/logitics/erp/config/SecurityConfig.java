@@ -30,8 +30,14 @@ public class SecurityConfig {
 						.csrf(csrf -> csrf.disable())
 						.httpBasic(basic -> basic.disable())
 						.formLogin(form -> form.disable())
-//						.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
-						.authorizeHttpRequests(auth -> auth.anyRequest().permitAll());
+						.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
+						// 모두 허용(deprecated)
+//						.authorizeHttpRequests(auth -> auth.anyRequest().permitAll());
+						.authorizeHttpRequests(
+										auth -> auth.requestMatchers(
+														"/api/v1/employees/login"
+										)
+														.permitAll().anyRequest().authenticated());
 //						.authorizeHttpRequests(
 //										auth -> auth.requestMatchers(
 //											""
