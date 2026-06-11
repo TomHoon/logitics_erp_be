@@ -19,6 +19,8 @@ import com.logitics.erp.employeelanguage.entity.EmployeeLanguage;
 import com.logitics.erp.employeelanguage.repository.EmployeeLanguageRepository;
 import com.logitics.erp.employeemilitary.entity.EmployeeMilitary;
 import com.logitics.erp.employeemilitary.repository.EmployeeMilitaryRepository;
+import com.logitics.erp.position.entity.Position;
+import com.logitics.erp.position.repository.PositionRepository;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.junit.jupiter.api.DisplayName;
@@ -41,6 +43,9 @@ public class EmployeeServiceTests {
 
 	@Autowired
 	private EmployeeRepository employeeRepository;
+
+	@Autowired
+	private PositionRepository positionRepository;
 
 	@Autowired
 	private EmployeeFamilyRepository employeeFamilyRepository;
@@ -99,7 +104,35 @@ public class EmployeeServiceTests {
 //						.build();
 	}
 
+	@Test
+	@DisplayName("포지션 추가")
+	@Commit
+	public void createPosition() {
+		Position p1 = new Position("사원", 0);
+		positionRepository.save(p1);
+	}
 
+	@Test
+	@DisplayName("직급수정")
+	@Commit
+	public void createOurPosition() {
+		Position p = positionRepository.findById(1L).orElseThrow();
+
+		List<String> list = List.of(
+				"riheun@naver.com",
+				"juan@naver.com",
+				"yerin@naver.com",
+				"jungmin@naver.com",
+				"minsung@naver.com",
+				"hajin@naver.com"
+		);
+
+		for (int i = 0; i < list.size(); i++) {
+			Employee e = employeeRepository.findByEmail(list.get(i)).orElseThrow();
+			e.setPosition(p);
+			employeeRepository.save(e);
+		}
+	}
 
 	@Test
 	@DisplayName("우리의 데이터 저장")

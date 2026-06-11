@@ -29,7 +29,9 @@ public class EmployeeEventSupportController {
 
 	@PostMapping
 	@Operation(summary = "경조비 신청", description = "경조비 신청합니다.")
-	public boolean registerEventSupport(@RequestBody EmployeeEventSupportRegisterRequest registerRequest) {
+	public boolean registerEventSupport(
+			@RequestBody EmployeeEventSupportRegisterRequest registerRequest
+	) {
 		return employeeEventSupportService.registerEventSupport(registerRequest);
 	}
 

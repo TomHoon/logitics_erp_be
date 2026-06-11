@@ -2,6 +2,7 @@ package com.logitics.erp.employee.entity;
 
 import com.logitics.erp.common.entity.BaseEntity;
 import com.logitics.erp.department.entity.Department;
+import com.logitics.erp.position.entity.Position;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -47,10 +48,16 @@ public class Employee extends BaseEntity {
 	@JoinColumn(name = "department_id")
 	private Department department;
 
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "position_id")
+	private Position position;
+
 	private String password;
 
 	public void setPassword(String password) {
 		this.password = password;
 	}
+
+	public void setPosition(Position p) { this.position = p; }
 
 }

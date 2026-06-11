@@ -85,6 +85,7 @@ public class EmployeeService {
 			String email = loginEmployee.getEmail();
 			String employeeNo = loginEmployee.getEmployeeNo();
 			String departmentName = loginEmployee.getDepartment().getDepartmentName();
+			String positionName = loginEmployee.getPosition().getPositionName();
 
 			return LoginResponse.builder()
 							.accessToken(accessToken)
@@ -92,6 +93,7 @@ public class EmployeeService {
 							.expireIn(expireIn)
 							.email(email)
 							.employeeNo(employeeNo)
+							.position(positionName)
 							.departmentName(departmentName)
 							.build();
 		}
