@@ -8,16 +8,12 @@ import java.time.LocalDate;
 public class EmployeeEventSupportRegisterRequest {
 
 	private Long employeeId;
-
 	private String eventType;
 	private String familyRelation;
 	private String targetName;
-
 	private LocalDate applicationDate;
 	private LocalDate eventDate;
-
 	private Integer requestedAmount;
-
 	private String eventLocation;
 	private String bankName;
 	private String accountNumber;

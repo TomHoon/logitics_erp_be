@@ -47,12 +47,12 @@
             #{targetName},
             #{applicationDate},
             #{eventDate},
-            #{requestedAmount}
-            #{eventLocation}
-            #{bankName}
-            #{accountNumber}
-            #{accountHolder}
-            #{approvalStatus}
+            #{requestedAmount},
+            #{eventLocation},
+            #{bankName},
+            #{accountNumber},
+            #{accountHolder},
+            #{approvalStatus},
             #{memo}
         )
     </insert>

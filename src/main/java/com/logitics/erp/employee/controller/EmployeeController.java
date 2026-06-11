@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -42,8 +43,10 @@ public class EmployeeController {
 									description = "사번/사원명으로조회",
 									example = "이채리1"
 					)
-					SearchEmployeeRequest request
+					SearchEmployeeRequest request,
+                    Authentication authentication
 	) {
+        String name = authentication.getName();
 		return employeeService.getEmployees(request);
 	}
 
