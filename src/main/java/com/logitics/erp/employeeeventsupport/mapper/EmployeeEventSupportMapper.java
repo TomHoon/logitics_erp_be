@@ -10,7 +10,8 @@ public interface EmployeeEventSupportMapper {
 	List<EmployeeEventSupportResponse> getSupportList(
 					@Param("size") int size,
 					@Param("offset") int offset,
-					@Param("keyword") String keyword
+					@Param("keyword") String keyword,
+					@Param("employeeId") Long employeeId
 	);
 
 	int registerEventSupport(EmployeeEventSupportRegisterRequest registerRequest);

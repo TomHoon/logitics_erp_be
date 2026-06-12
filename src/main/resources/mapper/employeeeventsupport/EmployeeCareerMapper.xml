@@ -6,10 +6,10 @@
 
     <select id="getSupportList"
     >
-        SELECT es.* FROM employee_support es
+        SELECT es.* FROM employee_event_support es
             LEFT JOIN employee e
                 ON es.employee_id = e.employee_id
-        WHERE 1=1
+        WHERE e.employee_id = #{employeeId}
         <if test="keyword != '' and keyword != null">
             AND (
                 e.name like concat('%', #{keyword}, '%')
@@ -20,8 +20,8 @@
 
         ORDER BY es.created_at DESC
 
-        LIMIT #{size}
-        OFFSET #{offset}
+<!--        LIMIT #{size}-->
+<!--        OFFSET #{offset}-->
     </select>
 
     <insert id="registerEventSupport">

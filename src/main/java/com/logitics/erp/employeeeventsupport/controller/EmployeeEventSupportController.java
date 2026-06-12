@@ -25,11 +25,15 @@ public class EmployeeEventSupportController {
 	@GetMapping
 	@Operation(summary = "경조비 신청 조회")
 	public List<EmployeeEventSupportResponse> getEventSupportList(
-					@RequestParam int page,
-					@RequestParam int size,
-					@RequestParam(required = false) String keyword
+					@RequestParam(defaultValue = "1") int page,
+					@RequestParam(defaultValue = "10") int size,
+					@RequestParam(required = false) String keyword,
+					Authentication authentication
 	) {
-		return employeeEventSupportService.getSupportList(page, size, keyword);
+		String email = authentication.getName();
+		Employee employee = employeeRepository.findByEmail(email).orElseThrow();
+		Long employeeId = employee.getEmployeeId();
+		return employeeEventSupportService.getSupportList(page, size, keyword, employeeId);
 	}
 
 	@PostMapping

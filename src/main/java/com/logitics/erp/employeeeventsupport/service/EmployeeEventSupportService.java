@@ -16,9 +16,9 @@ public class EmployeeEventSupportService {
 	private final EmployeeEventSupportMapper employeeEventSupportMapper;
 	private final EmployeeEventSupportRepository employeeEventSupportRepository;
 
-	public List<EmployeeEventSupportResponse> getSupportList(int page, int size, String keyword) {
+	public List<EmployeeEventSupportResponse> getSupportList(int page, int size, String keyword, Long employeeId) {
 		int offset = page * size;
-		return employeeEventSupportMapper.getSupportList(size, offset, keyword);
+		return employeeEventSupportMapper.getSupportList(size, offset, keyword, employeeId);
 	}
 
 	public boolean registerEventSupport(EmployeeEventSupportRegisterRequest registerRequest) {
