@@ -35,8 +35,15 @@ public class EmployeeController {
 		return employeeService.getTest();
 	}
 
+    @PostMapping("/joinErp")
+    @Tag(name = "Employee", description = "사원 ERP 가입 API")
+    @Operation(summary = "ERP 사이트 가입", description = "입사한 사원만 사이트 가입 가능")
+    public Boolean joinErp(@RequestBody JoinErpRequest joinErpRequest) {
+        return employeeService.joinErp(joinErpRequest);
+    }
+
     @PostMapping("/registerEmployee")
-    @Tag(name = "Employee", description = "사원 관리 API")
+    @Tag(name = "Employee", description = "사원 등록 API")
     @Operation(summary = "입사한 사원 등록(회원가입 아님)", description = "입사한 사원을 등록합니다. (회원가입은 따로 진행)")
     public Boolean registerEmployee(@RequestBody RegisterEmployeeRequest registerEmployeeRequest) {
         return employeeService.registerEmployee(registerEmployeeRequest);

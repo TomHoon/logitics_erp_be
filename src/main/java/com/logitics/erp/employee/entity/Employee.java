@@ -57,7 +57,7 @@ public class Employee extends BaseEntity {
 	public void setPassword(String password) {
 		this.password = password;
 	}
-
 	public void setPosition(Position p) { this.position = p; }
+    public void setEmail(String email) { this.email = email; }
 
 }

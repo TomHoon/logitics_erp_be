@@ -9,6 +9,7 @@ import com.logitics.erp.employee.mapper.EmployeeMapper;
 import com.logitics.erp.employee.repository.EmployeeRepository;
 import com.logitics.erp.position.entity.Position;
 import com.logitics.erp.position.repository.PositionRepository;
+import io.micrometer.common.util.StringUtils;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -118,7 +119,13 @@ public class EmployeeService {
                 .findByPositionName(receivedPositionName)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 직위입니다."));
 
-        // 3. 나머지 처리
+        // 3. 이메일 중복 체크
+        Optional<Employee> duplicateEmployee = employeeRepository.findByEmail(registerEmployeeRequest.getEmail());
+        if (duplicateEmployee.isPresent()) {
+            throw new IllegalArgumentException("이메일이 중복됩니다. 다른 이메일을 사용해주세요.");
+        }
+
+        // 4. 나머지 처리
         Long lastEmployeeNo = employeeRepository.findAll().getLast().getEmployeeId();
         Employee newEmployee = Employee
                 .builder()
@@ -136,5 +143,43 @@ public class EmployeeService {
         Employee registeredEmployee = employeeRepository.save(newEmployee);
 
         return registeredEmployee.getEmployeeId() > 0;
+    }
+
+    public Boolean joinErp(JoinErpRequest joinErpRequest) {
+        String receivedEmployeeNo = joinErpRequest.getEmployeeNo();
+        String receivedPositionName = joinErpRequest.getPositionName();
+
+        Employee e = employeeRepository
+                .findByEmployeeNo(receivedEmployeeNo)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사원번호입니다."));
+
+        Position p = positionRepository
+                .findByPositionName(receivedPositionName)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 직급입니다."));
+
+
+        String originPositionName = e.getPosition().getPositionName();
+        if (!originPositionName.equals(receivedPositionName)) {
+            throw new IllegalArgumentException("등록된 부서와 일치하지 않습니다.");
+        }
+
+        String pw = joinErpRequest.getPassword();
+        String chkPw = joinErpRequest.getCheckPassword();
+        if (!pw.equals(chkPw)) {
+            throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
+        }
+
+        if (StringUtils.isNotBlank(e.getPassword())) {
+            throw new IllegalArgumentException("이미 회원가입된 유저입니다. 고객센터에 문의하세요.");
+        }
+
+        e.setEmail(joinErpRequest.getEmail());
+
+        String encryptedPassword = passwordEncoder.encode(joinErpRequest.getPassword());
+
+        e.setPassword(encryptedPassword);
+
+        Employee joinedEmployee = employeeRepository.save(e);
+        return joinedEmployee.getEmployeeId() > 0;
     }
 }
