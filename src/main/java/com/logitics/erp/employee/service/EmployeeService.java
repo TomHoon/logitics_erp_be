@@ -7,6 +7,8 @@ import com.logitics.erp.employee.dto.*;
 import com.logitics.erp.employee.entity.Employee;
 import com.logitics.erp.employee.mapper.EmployeeMapper;
 import com.logitics.erp.employee.repository.EmployeeRepository;
+import com.logitics.erp.position.entity.Position;
+import com.logitics.erp.position.repository.PositionRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -14,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -21,6 +24,7 @@ public class EmployeeService {
 
 	private final EmployeeRepository employeeRepository;
 	private final DepartmentRepository departmentRepository;
+    private final PositionRepository positionRepository;
 	private final EmployeeMapper employeeMapper;
 	private final JwtProvider jwtProvider;
 	private final PasswordEncoder passwordEncoder;
@@ -100,4 +104,37 @@ public class EmployeeService {
 
 		throw new Exception("올바른 회원 정보가 아닙니다.");
 	}
+
+    public Boolean registerEmployee(RegisterEmployeeRequest registerEmployeeRequest) {
+        // 1. 존재하는 부서인지 확인
+        String recievedDepartmentName = registerEmployeeRequest.getDepartmentName();
+        Department department = departmentRepository
+                .findByDepartmentName(recievedDepartmentName)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 부서입니다."));
+
+        // 2. 존재하는 직급인지 확인
+        String receivedPositionName = registerEmployeeRequest.getPositionName();
+        Position position = positionRepository
+                .findByPositionName(receivedPositionName)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 직위입니다."));
+
+        // 3. 나머지 처리
+        Long lastEmployeeNo = employeeRepository.findAll().getLast().getEmployeeId();
+        Employee newEmployee = Employee
+                .builder()
+                .employeeNo("T" + String.format("%04d", lastEmployeeNo + 1))
+                .name(registerEmployeeRequest.getName())
+                .hireDate(LocalDate.parse(registerEmployeeRequest.getHireDate()))
+                .email(registerEmployeeRequest.getEmail())
+                .phone(registerEmployeeRequest.getPhone())
+                .address(registerEmployeeRequest.getDetailAddress())
+                .employeeStatusCode(registerEmployeeRequest.getEmploymentStatus())
+                .department(department)
+                .position(position)
+                .build();
+
+        Employee registeredEmployee = employeeRepository.save(newEmployee);
+
+        return registeredEmployee.getEmployeeId() > 0;
+    }
 }

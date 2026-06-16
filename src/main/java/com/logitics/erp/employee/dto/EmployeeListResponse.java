@@ -8,7 +8,12 @@ public class EmployeeListResponse {
 	private Long employeeId;
 	private String employeeNo;
 	private String name;
-	private String department;
+	private String positionName;
+    private String departmentName;
+    private String hireDate;
+    private String status;
+    private String phone;
+    private String email;
 
 
 }

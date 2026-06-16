@@ -35,6 +35,13 @@ public class EmployeeController {
 		return employeeService.getTest();
 	}
 
+    @PostMapping("/registerEmployee")
+    @Tag(name = "Employee", description = "사원 관리 API")
+    @Operation(summary = "입사한 사원 등록(회원가입 아님)", description = "입사한 사원을 등록합니다. (회원가입은 따로 진행)")
+    public Boolean registerEmployee(@RequestBody RegisterEmployeeRequest registerEmployeeRequest) {
+        return employeeService.registerEmployee(registerEmployeeRequest);
+    }
+
 	@GetMapping
 	@Tag(name = "Employee", description = "사원 관리 API")
 	@Operation(summary = "사원 조회", description = "사원 목록을 조회합니다.")

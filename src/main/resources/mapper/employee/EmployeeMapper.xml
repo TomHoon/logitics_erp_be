@@ -17,8 +17,19 @@
     <select id="getEmployees"
         resultType="EmployeeListResponse"
     >
-        select e.*
+        select
+            e.*,
+            e.phone as phone,
+            e.email as email,
+            COALESCE(e.hire_date, DATE(e.created_at)) as hireDate,
+            e.employee_status_code as status,
+            p.position_name as positionName,
+            d.department_name as departmentName
         from employee e
+            left join positions p
+                on p.position_id = e.position_id
+            left join department d
+                on e.department_id = d.department_id
         where 1=1
 
         <if test="request.keyword != null and request.keyword != ''">

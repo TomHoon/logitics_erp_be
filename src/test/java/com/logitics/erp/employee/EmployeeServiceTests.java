@@ -72,7 +72,7 @@ public class EmployeeServiceTests {
 	private PasswordEncoder passwordEncoder;
 
 	@Test
-	@DisplayName("회원가입 데이터 생성")
+	@DisplayName("2. 회원가입 데이터 생성")
 	@Commit
 	public void joinEmployee() {
 		record TestUser2(String name, String email) {}
@@ -105,7 +105,7 @@ public class EmployeeServiceTests {
 	}
 
 	@Test
-	@DisplayName("포지션 추가")
+	@DisplayName("3. 포지션 추가")
 	@Commit
 	public void createPosition() {
 		Position p1 = new Position("사원", 0);
@@ -113,7 +113,7 @@ public class EmployeeServiceTests {
 	}
 
 	@Test
-	@DisplayName("직급수정")
+	@DisplayName("4. 직급수정")
 	@Commit
 	public void createOurPosition() {
 		Position p = positionRepository.findById(1L).orElseThrow();
@@ -135,7 +135,7 @@ public class EmployeeServiceTests {
 	}
 
 	@Test
-	@DisplayName("우리의 데이터 저장")
+	@DisplayName("1. 우리의 데이터 저장")
 	@Commit
 	public void createOurData() {
 		record TestUser(String name, String email) {}
