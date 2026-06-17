@@ -68,7 +68,7 @@ public class EmployeeService {
 
 	public List<EmployeeListResponse> getEmployees(SearchEmployeeRequest request) {
 
-		int offset = request.getPage() * 10;
+		int offset = (request.getPage() - 1) * 10;
 		List<EmployeeListResponse> list = employeeMapper.getEmployees(request.getSize(), offset, request);
 
 		return list;
