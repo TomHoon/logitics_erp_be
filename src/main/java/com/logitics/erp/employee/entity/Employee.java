@@ -4,15 +4,13 @@ import com.logitics.erp.common.entity.BaseEntity;
 import com.logitics.erp.department.entity.Department;
 import com.logitics.erp.position.entity.Position;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDate;
 
 @Entity
 @Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
@@ -34,8 +32,12 @@ public class Employee extends BaseEntity {
 	private String email;
 	private String phone;
 
+    private String postCode;
+
 	@Column(length = 255)
 	private String address;
+
+    private String detailedAddress;
 
 	@Column(length = 30)
 	private String employeeStatusCode;
@@ -53,11 +55,5 @@ public class Employee extends BaseEntity {
 	private Position position;
 
 	private String password;
-
-	public void setPassword(String password) {
-		this.password = password;
-	}
-	public void setPosition(Position p) { this.position = p; }
-    public void setEmail(String email) { this.email = email; }
 
 }

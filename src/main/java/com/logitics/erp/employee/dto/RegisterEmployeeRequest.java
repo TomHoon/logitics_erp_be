@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class RegisterEmployeeRequest {
 
+    private String employeeNo;
     private String name;
     private String departmentName;
     private String positionName;
@@ -16,8 +17,9 @@ public class RegisterEmployeeRequest {
     private String employmentStatus;
     private String phone;
     private String email;
+
     private String postCode;
-    private String roadAddress;
-    private String detailAddress;
+    private String address;
+    private String detailedAddress;
 
 }

@@ -3,6 +3,7 @@ package com.logitics.erp.employee.controller;
 import com.logitics.erp.employee.dto.*;
 import com.logitics.erp.employee.entity.Employee;
 import com.logitics.erp.employee.service.EmployeeService;
+import io.micrometer.common.util.StringUtils;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -44,8 +45,12 @@ public class EmployeeController {
 
     @PostMapping("/registerEmployee")
     @Tag(name = "Employee", description = "사원 등록 API")
-    @Operation(summary = "입사한 사원 등록(회원가입 아님)", description = "입사한 사원을 등록합니다. (회원가입은 따로 진행)")
+    @Operation(summary = "입사한 사원 등록(회원가입 아님)", description = "입사한 사원을 등록합니다. (회원가입은 따로 진행) 사원번호를 함께 넣는 경우 수정으로 판단합니다.")
     public Boolean registerEmployee(@RequestBody RegisterEmployeeRequest registerEmployeeRequest) {
+        String employeeNo = registerEmployeeRequest.getEmployeeNo();
+        if (StringUtils.isNotBlank(employeeNo)) {
+            return employeeService.modifyEmployee(registerEmployeeRequest);
+        }
         return employeeService.registerEmployee(registerEmployeeRequest);
     }
 

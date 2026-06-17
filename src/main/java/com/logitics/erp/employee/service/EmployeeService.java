@@ -134,7 +134,9 @@ public class EmployeeService {
                 .hireDate(LocalDate.parse(registerEmployeeRequest.getHireDate()))
                 .email(registerEmployeeRequest.getEmail())
                 .phone(registerEmployeeRequest.getPhone())
-                .address(registerEmployeeRequest.getDetailAddress())
+                .postCode(registerEmployeeRequest.getPostCode())
+                .detailedAddress(registerEmployeeRequest.getDetailedAddress())
+                .address(registerEmployeeRequest.getDetailedAddress())
                 .employeeStatusCode(registerEmployeeRequest.getEmploymentStatus())
                 .department(department)
                 .position(position)
@@ -181,5 +183,54 @@ public class EmployeeService {
 
         Employee joinedEmployee = employeeRepository.save(e);
         return joinedEmployee.getEmployeeId() > 0;
+    }
+
+
+    // 존재하던 사원 정보 수정
+    public Boolean modifyEmployee(RegisterEmployeeRequest modifyEmployeeRequest) {
+        // 1. 존재하는 부서인지 확인
+        String receivedDepartmentName = modifyEmployeeRequest.getDepartmentName();
+        Department department = departmentRepository
+                .findByDepartmentName(receivedDepartmentName)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 부서입니다."));
+
+        // 2. 존재하는 직급인지 확인
+        String receivedPositionName = modifyEmployeeRequest.getPositionName();
+        Position position = positionRepository
+                .findByPositionName(receivedPositionName)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 직위입니다."));
+
+
+        // 4. 나머지 처리
+        Employee modifyEmployee = employeeRepository
+                .findByEmployeeNo(modifyEmployeeRequest.getEmployeeNo())
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사원번호입니다."));
+
+        // 5. 수정할 부서/직급 찾기
+        String changePositionName = modifyEmployeeRequest.getPositionName();
+        String changeDepartmentName = modifyEmployeeRequest.getDepartmentName();
+
+        Position changePosition = positionRepository
+                .findByPositionName(changePositionName)
+                .orElseThrow(() -> new IllegalArgumentException("수정할 직급이 존재하지 않습니다."));
+
+        Department changeDepartment = departmentRepository
+                .findByDepartmentName(changeDepartmentName)
+                .orElseThrow(() -> new IllegalArgumentException("수정할 부서가 존재하지 않습니다."));
+
+        modifyEmployee.setName(modifyEmployeeRequest.getName());
+        modifyEmployee.setHireDate(LocalDate.parse(modifyEmployeeRequest.getHireDate()));
+        modifyEmployee.setEmail(modifyEmployeeRequest.getEmail());
+        modifyEmployee.setPhone(modifyEmployeeRequest.getPhone());
+        modifyEmployee.setAddress(modifyEmployeeRequest.getAddress());
+        modifyEmployee.setPostCode(modifyEmployeeRequest.getPostCode());
+        modifyEmployee.setDetailedAddress(modifyEmployeeRequest.getDetailedAddress());
+        modifyEmployee.setEmployeeStatusCode(modifyEmployeeRequest.getEmploymentStatus());
+        modifyEmployee.setPosition(changePosition);
+        modifyEmployee.setDepartment(changeDepartment);
+
+        Employee changedEmployeeEntity = employeeRepository.save(modifyEmployee);
+
+        return changedEmployeeEntity.getEmployeeId() > 0;
     }
 }

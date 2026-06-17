@@ -21,6 +21,9 @@
             e.*,
             e.phone as phone,
             e.email as email,
+            e.address as address,
+            e.detailed_address as detailedAddress,
+            e.post_code as postCode,
             COALESCE(e.hire_date, DATE(e.created_at)) as hireDate,
             e.employee_status_code as status,
             p.position_name as positionName,
@@ -33,12 +36,22 @@
         where 1=1
 
         <if test="request.keyword != null and request.keyword != ''">
-            AND e.name = #{request.keyword}
+            AND (
+            e.name = #{request.keyword}
             OR e.employee_no = #{request.keyword}
+            )
         </if>
 
-        <if test="request.departmentName != null and request.departmentName != ''">
+        <if test="request.departmentName != null and request.departmentName != '' and request.departmentName != '전체'">
+            AND d.department_name = #{request.departmentName}
+        </if>
 
+        <if test="request.positionName != null and request.positionName != '' and request.positionName != '전체'">
+            AND p.position_name = #{request.positionName}
+        </if>
+
+        <if test="request.employeeStatusCode != null and request.employeeStatusCode != '' and request.employeeStatusCode != '전체'">
+            AND e.employee_status_code = #{request.employeeStatusCode}
         </if>
 
 

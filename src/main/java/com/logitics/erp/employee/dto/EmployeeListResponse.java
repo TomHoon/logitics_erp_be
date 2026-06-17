@@ -15,5 +15,8 @@ public class EmployeeListResponse {
     private String phone;
     private String email;
 
+    private String postCode;
+    private String address;
+    private String detailedAddress;
 
 }

@@ -1,5 +1,7 @@
 package com.logitics.erp.employeeappointment.mapper;
 
+import com.logitics.erp.employeeappointment.dto.AppointmentHistoryRequest;
+import com.logitics.erp.employeeappointment.dto.AppointmentHistoryResponse;
 import com.logitics.erp.employeeappointment.dto.EmployeementAppointmentResponse;
 import com.logitics.erp.employeeappointment.dto.RegisterAppointmentRequest;
 import com.logitics.erp.employeeeventsupport.dto.EmployeeEventSupportResponse;
@@ -18,4 +20,6 @@ public interface EmployeeAppointmentMapper {
 	int registerAppointment(RegisterAppointmentRequest registerAppointmentRequest);
 
 	List<EmployeeEventSupportResponse> getEventSupportList(int size, int offset, String keyword);
+
+    List<AppointmentHistoryResponse> getAppointmentHistory(AppointmentHistoryRequest appointmentHistoryRequest);
 }

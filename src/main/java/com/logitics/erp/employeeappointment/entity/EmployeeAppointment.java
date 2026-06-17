@@ -1,10 +1,7 @@
 package com.logitics.erp.employeeappointment.entity;
 
 import com.logitics.erp.common.entity.BaseEntity;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -23,7 +20,9 @@ public class EmployeeAppointment extends BaseEntity {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long employeeAppointmentId;
 
-	private String appointmentType;
+    @Column(name = "appointment_type")
+    @Enumerated(EnumType.STRING)
+	private AppointmentType appointmentType;
 
 	private LocalDate appointmentDate;
 	private LocalDate effectiveDate;

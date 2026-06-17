@@ -1,8 +1,11 @@
 package com.logitics.erp.employeeappointment.controller;
 
 
+import com.logitics.erp.employeeappointment.dto.AppointmentHistoryRequest;
+import com.logitics.erp.employeeappointment.dto.AppointmentHistoryResponse;
 import com.logitics.erp.employeeappointment.dto.EmployeementAppointmentResponse;
 import com.logitics.erp.employeeappointment.dto.RegisterAppointmentRequest;
+import com.logitics.erp.employeeappointment.entity.AppointmentType;
 import com.logitics.erp.employeeappointment.service.EmployeeAppointmentService;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
@@ -34,4 +37,19 @@ public class EmployeeAppointmentController {
 		 */
 		return employeeAppointmentService.registerAppointment(registerAppointmentRequest);
 	}
+
+    @GetMapping("/types")
+    @Operation(summary = "발령구분전체조회", description = "발령구분 모든 타입 조회")
+    public List<String> getAppointTypeList() {
+        return employeeAppointmentService.getAppointTypeList();
+    }
+
+    @GetMapping("/history")
+    @Operation(summary = "발령조회", description = "발령이력조회 합니다.")
+    public List<AppointmentHistoryResponse> getAppointmentHistory(@RequestParam AppointmentHistoryRequest appointmentHistoryRequest) {
+        return employeeAppointmentService.getAppointmentHistory(appointmentHistoryRequest);
+    }
+
+
+
 }
