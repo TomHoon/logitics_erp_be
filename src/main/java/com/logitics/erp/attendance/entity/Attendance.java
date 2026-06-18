@@ -16,6 +16,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Getter
 @Builder
+
 public class Attendance extends BaseEntity {
 
 	@Id
@@ -41,4 +42,14 @@ public class Attendance extends BaseEntity {
 	@Column(length = 30)
 	private String attendanceStatusCode;
 
+	private String comment;
+
+
+	public void setCheckOutTime(LocalDateTime checkOutTime) {
+		this.checkOutTime = checkOutTime;
+	}
+
+	public void setAttendanceStatusCode(String attendanceStatusCode) {
+		this.attendanceStatusCode = attendanceStatusCode;
+	}
 }

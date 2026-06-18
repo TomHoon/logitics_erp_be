@@ -21,4 +21,6 @@ public class AttendanceDailyResponse {
     private String overTime;
     private String comment;
 
+    private String attendanceStatusCode;
+
 }
