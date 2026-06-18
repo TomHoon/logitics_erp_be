@@ -136,7 +136,7 @@ public class EmployeeService {
                 .phone(registerEmployeeRequest.getPhone())
                 .postCode(registerEmployeeRequest.getPostCode())
                 .detailedAddress(registerEmployeeRequest.getDetailedAddress())
-                .address(registerEmployeeRequest.getDetailedAddress())
+                .address(registerEmployeeRequest.getAddress())
                 .employeeStatusCode(registerEmployeeRequest.getEmploymentStatus())
                 .department(department)
                 .position(position)
