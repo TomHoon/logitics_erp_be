@@ -1,4 +1,8 @@
 spring:
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 50MB
   datasource:
     url: jdbc:mariadb://localhost:3306/erp
     username: root
@@ -25,3 +29,6 @@ mybatis:
 
 server:
   port: 33000
+
+file:
+  upload-dir: uploads

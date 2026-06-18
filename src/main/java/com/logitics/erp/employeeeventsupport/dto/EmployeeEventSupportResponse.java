@@ -24,4 +24,10 @@ public class EmployeeEventSupportResponse {
 	private String accountHolder;
 	private String approvalStatus;
 	private String memo;
+
+    private Long savedFileId;
+    private String savedFileName;
+    private String savedFileDate;
+    private String savedFileExt;
+    private String savedFileSize;
 }

@@ -22,6 +22,12 @@ public class EmployeeEventSupportController {
 	private final EmployeeEventSupportService employeeEventSupportService;
 	private final EmployeeRepository employeeRepository;
 
+    @GetMapping("/detail/{eventSupportId}")
+    @Operation(summary = "경조비 상세조회", description = "상세 버튼 클릭시 모달 상세내용")
+    public EmployeeEventSupportResponse getEventSupportDetail(@PathVariable Long eventSupportId) {
+        return employeeEventSupportService.getEventSupportDetail(eventSupportId);
+    }
+
 	@GetMapping
 	@Operation(summary = "경조비 신청 조회")
 	public List<EmployeeEventSupportResponse> getEventSupportList(

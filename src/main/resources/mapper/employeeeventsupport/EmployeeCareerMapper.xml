@@ -24,7 +24,11 @@
 <!--        OFFSET #{offset}-->
     </select>
 
-    <insert id="registerEventSupport">
+    <insert
+        id="registerEventSupport"
+        keyProperty="employeeEventSupportId"
+        keyColumn="employeeEventSupportId"
+    >
         INSERT INTO employee_event_support(
             employee_id,
             event_type,
@@ -64,5 +68,27 @@
             WHERE ec.employee_event_support = #{eventSupportId}
     </update>
 
+    <update id="updateFileRefId">
+        UPDATE file_attachment fa
+        SET fa.ref_id = #{eventSupportId}
+        where fa.file_id = #{fileId}
+    </update>
 
+
+    <select
+        id="getEventSupportDetail"
+    >
+        select
+            ees.*,
+            fa.original_name as savedFileName,
+            fa.extension as savedFileExt,
+            fa.file_id as savedFileId,
+            fa.created_at as savedFileDate,
+            fa.file_size as savedFileSize,
+        from employee_event_support ees
+            left join file_attachment fa
+            on ees.employee_event_support_id = fa.ref_id
+
+        where ees.employee_event_support_id  = #{eventSupportId}
+    </select>
 </mapper>

@@ -17,4 +17,8 @@ public interface EmployeeEventSupportMapper {
 	int registerEventSupport(EmployeeEventSupportRegisterRequest registerRequest);
 
 	int deleteEventSupport(Long eventSupportId);
+
+    int updateFileRefId(Long fileId, Long eventSupportId);
+
+    EmployeeEventSupportResponse getEventSupportDetail(Long eventSupportId);
 }

@@ -4,6 +4,7 @@ import com.logitics.erp.common.util.ApiResponse;
 import org.jspecify.annotations.Nullable;
 import org.springframework.core.MethodParameter;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;
@@ -25,6 +26,9 @@ public class ApiResponseAdvice implements ResponseBodyAdvice<Object> {
 		if (className.contains("springdoc")) {
 			return false;
 		}
+        if (ResponseEntity.class.isAssignableFrom(returnType.getParameterType())) {
+            return false;
+        }
 		return true;
 	}
 
