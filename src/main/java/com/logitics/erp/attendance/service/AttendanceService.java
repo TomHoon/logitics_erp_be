@@ -2,6 +2,7 @@ package com.logitics.erp.attendance.service;
 
 import com.logitics.erp.attendance.dto.AttendRequest;
 import com.logitics.erp.attendance.dto.AttendResponse;
+import com.logitics.erp.attendance.dto.AttendanceDailyResponse;
 import com.logitics.erp.attendance.dto.AttendanceResultResponse;
 import com.logitics.erp.attendance.entity.Attendance;
 import com.logitics.erp.attendance.mapper.AttendanceMapper;
@@ -54,6 +55,12 @@ public class AttendanceService {
 		int offset = page * 10;
 		String endDate = LocalDate.now().plusMonths(1).toString();
 		return attendanceMapper.getMonthAttendance(size, offset, departmentId, startDate, endDate);
+	}
+
+	public List<AttendanceDailyResponse> getAttendanceDaily() {
+
+		List<AttendanceDailyResponse> list = attendanceMapper.getAttendanceDaily();
+		return list;
 	}
 }
 

@@ -23,6 +23,18 @@
         LIMIT #{size} OFFSET #{offset}
     </select>
 
+    <select id="getAttendanceDaily">
+        select
+        *
+        from employee e
+        left join attendance a
+        on a.employee_id = e.employee_id
+        left join positions p
+        on e.position_id = p.position_id
+        left join department d
+        on e.department_id= d.department_id
+    </select>
+
 <!--    <insert-->
 <!--        id="addInfo"-->
 <!--        parameterType="EmployeeCareerAddInfoRequest"-->
