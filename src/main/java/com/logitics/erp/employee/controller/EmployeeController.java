@@ -7,6 +7,8 @@ import io.micrometer.common.util.StringUtils;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
@@ -22,8 +24,22 @@ public class EmployeeController {
 	private final EmployeeService employeeService;
 
 	@PostMapping("/login")
-	public LoginResponse login(@RequestBody LoginRequest loginRequest) throws Exception{
-		return employeeService.login(loginRequest);
+	public LoginResponse login(@RequestBody LoginRequest loginRequest, HttpServletResponse response
+	) throws Exception{
+		LoginResponse loginResponse = employeeService.login(loginRequest);
+
+		Cookie cookie = new Cookie(
+						"accessToken",
+						loginResponse.getAccessToken()
+		);
+
+		cookie.setHttpOnly(true);
+		cookie.setPath("/");
+		cookie.setMaxAge(60 * 60);
+
+		response.addCookie(cookie);
+
+		return loginResponse;
 	}
 
 	@GetMapping("/createTest")
