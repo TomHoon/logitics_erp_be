@@ -84,7 +84,7 @@
             fa.extension as savedFileExt,
             fa.file_id as savedFileId,
             fa.created_at as savedFileDate,
-            fa.file_size as savedFileSize,
+            fa.file_size as savedFileSize
         from employee_event_support ees
             left join file_attachment fa
             on ees.employee_event_support_id = fa.ref_id
