@@ -40,6 +40,19 @@ public class JwtFilter extends OncePerRequestFilter {
 //								List.of(new SimpleGrantedAuthority("ROLE_ADMIN"))
 //				);
 
+			} else {
+				response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // 401 추천
+				response.setContentType("application/json;charset=UTF-8");
+
+				response.getWriter().write("""
+					{
+					  "success": false,
+					  "message": "토큰이 만료되었거나 유효하지 않습니다.",
+					  "data": null
+					}
+				""");
+
+				return;
 			}
 		}
 

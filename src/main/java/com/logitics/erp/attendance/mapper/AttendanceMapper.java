@@ -5,7 +5,9 @@ import com.logitics.erp.attendance.dto.AttendanceDailyResponse;
 import com.logitics.erp.attendance.dto.AttendanceInfoListResponse;
 import com.logitics.erp.attendance.dto.AttendanceResultResponse;
 
+import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
 public interface AttendanceMapper {
 	List<AttendanceResultResponse> getMonthAttendance(int size, int offset, Long departmentId, String startDate, String endDate);
@@ -13,4 +15,6 @@ public interface AttendanceMapper {
 	List<AttendanceDailyResponse> getAttendanceDaily(String findDate);
 
 	List<AttendanceInfoListResponse> getAttendanceInfoList(String findDate);
+
+	Map<String, Object> getSummaryByEmployee(LocalDate findDate, Long employeeId);
 }

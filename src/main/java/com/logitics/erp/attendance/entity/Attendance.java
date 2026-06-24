@@ -2,6 +2,7 @@ package com.logitics.erp.attendance.entity;
 
 import com.logitics.erp.common.entity.BaseEntity;
 import com.logitics.erp.employee.entity.Employee;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -30,14 +31,19 @@ public class Attendance extends BaseEntity {
 	@Column(nullable = false)
 	private LocalDate workDate;
 
+	@Schema(description = "출근시간")
 	private LocalDateTime checkInTime;
+
+	@Schema(description = "퇴근시간")
 	private LocalDateTime checkOutTime;
 
 	private Integer workMinutes;
 	private Integer overtimeMinutes;
 	private Integer nightWorkMinutes;
 	private Integer lateMinutes;
-	private Integer earlyLeaveMinutes;
+	
+	@Schema(description = "비근무시간")
+	private Long earlyLeaveMinutes;
 
 	@Column(length = 30)
 	private String attendanceStatusCode;
@@ -51,5 +57,9 @@ public class Attendance extends BaseEntity {
 
 	public void setAttendanceStatusCode(String attendanceStatusCode) {
 		this.attendanceStatusCode = attendanceStatusCode;
+	}
+
+	public void setEarlyLeaveMinutes(Long time) {
+		this.earlyLeaveMinutes = time;
 	}
 }

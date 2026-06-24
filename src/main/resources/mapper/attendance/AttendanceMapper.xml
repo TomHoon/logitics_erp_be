@@ -63,6 +63,13 @@
         on e.department_id= d.department_id
     </select>
 
+    <select id="getSummaryByEmployee">
+        select * from attendance
+        where 1=1
+        and
+
+    </select>
+
 <!--    <insert-->
 <!--        id="addInfo"-->
 <!--        parameterType="EmployeeCareerAddInfoRequest"-->

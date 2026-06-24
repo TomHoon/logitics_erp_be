@@ -5,6 +5,7 @@ import com.logitics.erp.employee.entity.Employee;
 import com.logitics.erp.leavetype.entity.LeaveType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
@@ -12,6 +13,7 @@ import java.time.LocalDate;
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 public class LeaveRequest extends BaseEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -28,11 +30,12 @@ public class LeaveRequest extends BaseEntity {
 	private LocalDate startDate;
 	private LocalDate endDate;
 
-	private Double leaveDays;
+	private Long leaveDays;
 
 	private String reason;
 	private String status;
 
-	private int approvalId;
+	// 결재사원번호
+	private Long approvalId;
 
 }

@@ -4,6 +4,7 @@ import com.logitics.erp.attendance.dto.*;
 import com.logitics.erp.attendance.entity.Attendance;
 import com.logitics.erp.attendance.service.AttendanceService;
 import com.logitics.erp.employee.repository.EmployeeRepository;
+import com.logitics.erp.leaverequest.entity.LeaveRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -39,6 +41,31 @@ public class AttendanceController {
 		return attendanceService.checkout(attendRequest);
 	}
 
+	@PostMapping("/early-leave")
+	@Operation(summary = "조퇴")
+	public Map<String, String> earlyLeave(@RequestBody EarlyLeaveRequest request, Authentication authentication) {
+		String email = authentication.getName();
+		String employeeNo = employeeRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("찾는 유저 정보가 없습니다.")).getEmployeeNo();
+		request.setEmployeeNo(employeeNo);
+		return attendanceService.earlyLeave(request);
+	}
+
+	@PostMapping("/leave")
+	@Operation(summary = "연차")
+	public Map<String, String> requestLeave(@RequestBody LeaveRequestDTO request, Authentication authentication) {
+
+		String leaveType = request.getLeaveType();
+
+		if (!leaveType.equals("종일")) {
+			throw new IllegalArgumentException("현재는 종일 연차만 가능합니다.");
+		}
+
+		String email = authentication.getName();
+		String employeeNo = employeeRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("찾는 유저 정보가 없습니다.")).getEmployeeNo();
+		request.setEmployeeNo(employeeNo);
+		return attendanceService.requestLeave(request);
+	}
+
 	@GetMapping("/daily")
 	@Operation(summary = "일일근태리스트조회")
 	public List<AttendanceDailyResponse> getAttendanceDaily(@RequestParam(required = false) String findDate) {
@@ -48,9 +75,15 @@ public class AttendanceController {
 
 	@GetMapping("/monthly")
 	@Operation(summary = "월근태현황조회")
-	public List<AttendanceResultResponse> getMonthly(@RequestParam(required = false) String findDate) {
+	public List<AttendanceResultResponse> getMonthly(@RequestParam(required = false) LocalDate findDate) {
 		return attendanceService.getMonthly(findDate);
 	}
+
+//	@GetMapping("/late/checkin")
+//	@Operation(summary = "월근태현황조회")
+//	public List<AttendanceResultResponse> getMonthly(@RequestParam(required = false) String findDate) {
+//		return attendanceService.getMonthly(findDate);
+//	}
 
 	@GetMapping("/month")
 	@Operation(summary = "월근태현황조회(미사용)")
