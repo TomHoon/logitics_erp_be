@@ -1,0 +1,383 @@
+{
+  "info": {
+    "_postman_id": "1f84f100-c635-496e-ab0e-f9da5cf8dfeb",
+    "name": "ERP",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "월근태현황",
+      "id": "0308ccfd-ac4d-4f25-893b-1bda50af0c33",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": ""
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "경조비신청",
+      "id": "dedcf5ce-73b4-4ac6-9335-0fd306ad10c0",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ5ZXJpbkBuYXZlci5jb20iLCJpYXQiOjE3ODExNzI0MDgsImV4cCI6MTc4MTE3NDIwOH0.flo9i9vv036eEfcmRMm6MJPo3DchiVtX2XgDMCylElI",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"eventType\": \"본인결혼\",\r\n    \"familyRelation\": \"본인\",\r\n    \"targetName\": \"이동훈\",\r\n    \"applicationDate\": \"2026-06-09\",\r\n    \"eventDate\": \"2026-06-09\",\r\n    \"requestedAmount\": 500000,\r\n    \"eventLocation\": \"서울시\",\r\n    \"bankName\": \"하나은행\",\r\n    \"accountNumber\": \"339-910124-24707\",\r\n    \"accountHolder\": \"이동훈\",\r\n    \"approvalStatus\": \"확인\",\r\n    \"memo\": \"\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:33000/api/v1/support",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "33000",
+          "path": [
+            "api",
+            "v1",
+            "support"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "로그인",
+      "id": "a6c97030-82fe-4a9b-8e51-8b6e58bb6d6f",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"email\": \"hajin@naver.com\",\r\n    \"password\": \"1234\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:33000/api/v1/employees/login",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "33000",
+          "path": [
+            "api",
+            "v1",
+            "employees",
+            "login"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "파일업로드",
+      "id": "d03cf106-22c5-453f-8a9d-7a712ae58cb4",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ5ZXJpbkBuYXZlci5jb20iLCJpYXQiOjE3ODIxMTY3NjUsImV4cCI6MTc4MjExODU2NX0.Nh0he8oieAyZV72Q-9zILsdXLNC8g9Bp-TWopIgFw5g",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ5ZXJpbkBuYXZlci5jb20iLCJpYXQiOjE3ODIxMTY1ODcsImV4cCI6MTc4MjExODM4N30.04wc6ySYPqBBKv1a_w_TgL3xGIztG5OqmwsAM85okO4",
+            "type": "text",
+            "disabled": true
+          }
+        ],
+        "body": {
+          "mode": "formdata",
+          "formdata": [
+            {
+              "key": "file",
+              "type": "file",
+              "src": [
+                "/C:/Users/gnsdl/Pictures/workout.jpg"
+              ]
+            },
+            {
+              "key": "refType",
+              "value": "경조사비신청",
+              "type": "text"
+            }
+          ]
+        },
+        "url": {
+          "raw": "http://localhost:33000/api/v1/files/upload",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "33000",
+          "path": [
+            "api",
+            "v1",
+            "files",
+            "upload"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "경조사비신청",
+      "id": "03149269-9c6e-443b-936a-9c406dbdfbe6",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ5ZXJpbkBuYXZlci5jb20iLCJpYXQiOjE3ODIxMTY3NjUsImV4cCI6MTc4MjExODU2NX0.Nh0he8oieAyZV72Q-9zILsdXLNC8g9Bp-TWopIgFw5g",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"eventType\": \"결혼\",\r\n  \"familyRelation\": \"본인\",\r\n  \"targetName\": \"이동훈\",\r\n  \"applicationDate\": \"2026-06-22\",\r\n  \"eventDate\": \"2026-06-22\",\r\n  \"requestedAmount\": 50000,\r\n  \"eventLocation\": \"서울시\",\r\n  \"bankName\": \"농협\",\r\n  \"accountNumber\": \"3120116768251\",\r\n  \"accountHolder\": \"이동훈\",\r\n  \"approvalStatus\": \"확인\",\r\n  \"memo\": \"\",\r\n  \"fileIdList\": [\r\n    3\r\n  ]\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:33000/api/v1/support",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "33000",
+          "path": [
+            "api",
+            "v1",
+            "support"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "출근등록",
+      "id": "22e7a927-3d08-47e4-b8c0-75066850f8bf",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{accessToken}}",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"workDate\": \"2026-06-23\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:33000/api/v1/attendances/checkin",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "33000",
+          "path": [
+            "api",
+            "v1",
+            "attendances",
+            "checkin"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "출근조회",
+      "id": "26e13ff3-03a8-4f0c-8664-2e3d5da43c97",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{accessToken}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "http://localhost:33000/api/v1/attendances/daily",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "33000",
+          "path": [
+            "api",
+            "v1",
+            "attendances",
+            "daily"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "퇴근",
+      "id": "e41ef645-db4e-4e2e-a83d-67aa1a8ebe1b",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJoYWppbkBuYXZlci5jb20iLCJpYXQiOjE3ODIzODA2NzAsImV4cCI6MTc4MjM4MjQ3MH0.GfSb1Rbdq-Ls2ieGEtsxzv_Oa4UVrXyNbpmIFQY0ey0",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "{{accessToken}}",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"workDate\": \"2026-06-25\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:33000/api/v1/attendances/checkout",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "33000",
+          "path": [
+            "api",
+            "v1",
+            "attendances",
+            "checkout"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "조퇴",
+      "id": "6487cfee-961b-47cc-b142-2268c55aa54c",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{accessToken}}",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"earlyLeaveTime\": \"2026-06-24T14:00:00.000Z\",\r\n  \"reason\": \"병원방문\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:33000/api/v1/attendances/early-leave",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "33000",
+          "path": [
+            "api",
+            "v1",
+            "attendances",
+            "early-leave"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "연차등록",
+      "id": "a78b4530-ad8c-40d9-9f55-d76bfa13a22e",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{accessToken}}",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"startDate\": \"2026-08-07\",\r\n  \"endDate\": \"2026-08-10\",\r\n  \"leaveType\": \"종일\",\r\n  \"leaveReason\": \"개인사유\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:33000/api/v1/attendances/leave",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "33000",
+          "path": [
+            "api",
+            "v1",
+            "attendances",
+            "leave"
+          ]
+        }
+      },
+      "response": []
+    }
+  ]
+}
