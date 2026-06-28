@@ -70,6 +70,14 @@
 
     </select>
 
+    <select id="findTodayAttendance">
+        select * from attendance
+        where work_date = #{now}
+        and employee_id = #{employeeId}
+
+
+    </select>
+
 <!--    <insert-->
 <!--        id="addInfo"-->
 <!--        parameterType="EmployeeCareerAddInfoRequest"-->

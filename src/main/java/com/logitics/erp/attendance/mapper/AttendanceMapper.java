@@ -4,6 +4,7 @@ import com.logitics.erp.attendance.dto.AttendResponse;
 import com.logitics.erp.attendance.dto.AttendanceDailyResponse;
 import com.logitics.erp.attendance.dto.AttendanceInfoListResponse;
 import com.logitics.erp.attendance.dto.AttendanceResultResponse;
+import com.logitics.erp.attendance.entity.Attendance;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -17,4 +18,6 @@ public interface AttendanceMapper {
 	List<AttendanceInfoListResponse> getAttendanceInfoList(String findDate);
 
 	Map<String, Object> getSummaryByEmployee(LocalDate findDate, Long employeeId);
+
+	Attendance findTodayAttendance(Long employeeId, LocalDate now);
 }

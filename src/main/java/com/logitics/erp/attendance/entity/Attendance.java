@@ -62,4 +62,8 @@ public class Attendance extends BaseEntity {
 	public void setEarlyLeaveMinutes(Long time) {
 		this.earlyLeaveMinutes = time;
 	}
+
+	public void setEmployee(Employee e) {
+		this.employee = e;
+	}
 }

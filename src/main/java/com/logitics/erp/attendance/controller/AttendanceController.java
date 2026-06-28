@@ -69,6 +69,9 @@ public class AttendanceController {
 	@GetMapping("/daily")
 	@Operation(summary = "일일근태리스트조회")
 	public List<AttendanceDailyResponse> getAttendanceDaily(@RequestParam(required = false) String findDate) {
+		if (findDate == null) {
+			findDate = LocalDate.now().toString();
+		}
 		List<AttendanceDailyResponse> list = attendanceService.getAttendanceDaily(findDate);
 		return list;
 	}

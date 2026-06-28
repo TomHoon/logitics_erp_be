@@ -48,7 +48,7 @@ public class AttendanceService {
 
 		// 2. 오늘 출근했는지 확인
 		Long employeeId = employee.getEmployeeId();
-		Attendance employeeAttendance = attendanceRepository.findByEmployee(employee).orElse(null);
+		Attendance employeeAttendance = attendanceMapper.findTodayAttendance(employeeId, LocalDate.now());
 
 		if (employeeAttendance != null) {
 			LocalDateTime todayCheckIn = employeeAttendance.getCheckInTime();
@@ -89,6 +89,9 @@ public class AttendanceService {
 
 	public List<AttendanceDailyResponse> getAttendanceDaily(String findDate) {
 
+		if (findDate == null) {
+			findDate = LocalDate.now().toString();
+		}
 		List<AttendanceDailyResponse> list = attendanceMapper.getAttendanceDaily(findDate);
 		return list;
 	}
@@ -99,7 +102,9 @@ public class AttendanceService {
 
 		// 2. 오늘 퇴근했는지 확인
 		Long employeeId = employee.getEmployeeId();
-		Attendance employeeAttendance = attendanceRepository.findByEmployee(employee).orElse(null);
+		Attendance employeeAttendance = attendanceMapper.findTodayAttendance(employeeId, LocalDate.now());
+		employeeAttendance.setEmployee(employee);
+
 
 		if (employeeAttendance != null) {
 			LocalDateTime todayCheckout = employeeAttendance.getCheckOutTime();
@@ -115,11 +120,31 @@ public class AttendanceService {
 
 		// 3. 퇴근처리하기
 		employeeAttendance.setCheckOutTime(LocalDateTime.now());
+
+		// 4. 퇴근시간 5분 전 이상인 경우 퇴근하지 못하도록 처리
+		LocalTime endTime = attendanceProperty.getEndTime();
+		int endHour = endTime.getHour();
+		int endMinute = endTime.getMinute();
+
+		LocalTime now = LocalTime.now();
+		int nowHour = now.getHour();
+		int nowMinute = now.getHour();
+
+		// 퇴근시간 검사1) 퇴근시간 되기 전인 경우
+		if ((nowHour < endHour)) {
+			throw new IllegalArgumentException("[ERR-CHECKOUT-001] 퇴근시간 5분 전 부터 퇴근처리가 가능합니다.");
+		}
+
+		// 퇴근시간 검사2) 퇴근 시간이지만 5분 보다 전인 경우
+		if ((nowHour == endHour && (nowMinute < endMinute -5 ))) {
+			throw new IllegalArgumentException("[ERR-CHECKOUT-002] 퇴근시간 5분 전 부터 퇴근처리가 가능합니다.");
+		}
+
 		employeeAttendance.setAttendanceStatusCode("퇴근");
 
-		attendanceRepository.save(employeeAttendance);
+		Attendance savedAttendance = attendanceRepository.save(employeeAttendance);
 
-		return new AttendResponse(employeeAttendance);
+		return new AttendResponse(savedAttendance);
 	}
 
 	public List<AttendanceResultResponse> getMonthly(LocalDate findDate) {
