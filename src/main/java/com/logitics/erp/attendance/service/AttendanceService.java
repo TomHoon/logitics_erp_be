@@ -341,7 +341,10 @@ public class AttendanceService {
 
         // 2. 해당 사원의 휴가 정보 조회
         Long employeeId = e.getEmployeeId();
-        return leaveBalanceMapper.getBasicInfo(employeeId);
+		AttendBasicInfoResponse result = leaveBalanceMapper.getBasicInfo(employeeId);
+		result.setWorkStartTime(attendanceProperty.getStartTime().toString());
+		result.setWorkEndTime(attendanceProperty.getEndTime().toString());
+		return result;
     }
 }
 

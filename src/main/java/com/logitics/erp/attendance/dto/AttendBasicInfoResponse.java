@@ -22,4 +22,10 @@ public class AttendBasicInfoResponse {
     @Schema(description = "출근 시간(미출근시 데이터 없음)")
     private String checkInTime;
 
+    @Schema(description = "출근시각")
+    private String workStartTime;
+
+    @Schema(description = "퇴근시각")
+    private String workEndTime;
+
 }
