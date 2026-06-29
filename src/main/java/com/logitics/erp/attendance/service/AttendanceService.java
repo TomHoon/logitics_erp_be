@@ -5,7 +5,10 @@ import com.logitics.erp.attendance.entity.Attendance;
 import com.logitics.erp.attendance.mapper.AttendanceMapper;
 import com.logitics.erp.attendance.repository.AttendanceRepository;
 import com.logitics.erp.attendance.util.AttendanceProperty;
+import com.logitics.erp.department.entity.Department;
+import com.logitics.erp.department.repository.DepartmentRepository;
 import com.logitics.erp.employee.entity.Employee;
+import com.logitics.erp.employee.mapper.EmployeeMapper;
 import com.logitics.erp.employee.repository.EmployeeRepository;
 import com.logitics.erp.leavebalance.entity.LeaveBalance;
 import com.logitics.erp.leavebalance.mapper.LeaveBalanceMapper;
@@ -37,11 +40,14 @@ public class AttendanceService {
 	private final AttendanceMapper attendanceMapper;
 	private final AttendanceRepository attendanceRepository;
 	private final EmployeeRepository employeeRepository;
+	private final EmployeeMapper employeeMapper;
 	private final AttendanceProperty attendanceProperty;
 	private final LeaveRequestRepository leaveRequestRepository;
 	private final LeaveTypeRepository leaveTypeRepository;
 	private final LeaveBalanceRepository leaveBalanceRepository;
     private final LeaveBalanceMapper leaveBalanceMapper;
+    private final DepartmentRepository departmentRepository;
+
 
 	@Transactional
 	public AttendResponse attend(AttendRequest attendRequest) {
@@ -146,45 +152,70 @@ public class AttendanceService {
 		return new AttendResponse(savedAttendance);
 	}
 
-	public List<AttendanceResultResponse> getMonthly(LocalDate findDate) {
+	public List<AttendanceResultResponse> getMonthly(AttendanceMonthlyRequest request) {
 
 		List<AttendanceResultResponse> resultList = new ArrayList<>();
 
 		// 1. findDate 없으면 현재 날짜로 설정
-		if (findDate == null) {
-			findDate = LocalDate.now();
+		if (request.getFindDate() == null) {
+            request.setFindDate(LocalDate.now());
 		}
+
+        LocalDate findDate = request.getFindDate();
 
 		// 2. findDate에서 해당 월의 days 가져오기
 		int days = findDate.lengthOfMonth();
 
-		// 3. findDate에서 해당 월의 days로 List 생성(기본값인 "-" 셋팅)
-		List<String> daysList =new ArrayList<String>(Collections.nCopies(days, "-"));
-
+        // 3.
 
 		// 4. 해당 월의 Attendance 조회하여 days List에 채우기
 		// 4-1) 전 사원 조회
-		List<Employee> allEmployeeList = employeeRepository.findAll();
-		
+        String deptName = request.getDepartmentName();
+
+        if (deptName == null || "전체".equals(deptName)) {
+            deptName = null;
+        }
+
+		List<Employee> allEmployeeList = (deptName == null || deptName.equals("전체")) ? employeeRepository.findAll() : employeeRepository.findByDepartment_DepartmentName(deptName);
+
 		// 4-2) 전사원 순회 돌며 resultList에 미리 넣기
 		for (Employee e : allEmployeeList) {
+            // 4-3. findDate에서 해당 월의 days로 List 생성(기본값인 "-" 셋팅)
+            List<String> daysList = new ArrayList<String>(Collections.nCopies(days, "-"));
+
 			AttendanceResultResponse ar = new AttendanceResultResponse();
 			ar.setName(e.getName());
 			ar.setDepartmentName(e.getDepartment().getDepartmentName());
 
 			// 4-3) 해당 월의 사원의 summary 값 넣어주기
-			Map<String, Object> summaryRes = attendanceMapper.getSummaryByEmployee(findDate, e.getEmployeeId());
+//			Map<String, Object> summaryRes = attendanceMapper.getSummaryByEmployee(findDate, e.getEmployeeId());
 
-			resultList.add(ar);
+
+            // 4-4) 해당 월의 사원 근태 조회
+            LocalDate startMonth = findDate.withDayOfMonth(1);
+            LocalDate endMonth = startMonth.plusMonths(1);
+
+
+            List<Attendance> attendanceList = attendanceMapper.getAttendanceListByPeriod(startMonth, endMonth, e.getEmployeeId(), request.getDepartmentName());
+
+            // 4-5) 해당 월의 사원 근태리스트 > 존재하는 것만 뽑아서 daysList에 넣어준다.
+            for (Attendance a : attendanceList) {
+                LocalDate workDate = a.getWorkDate();
+                int dayOfMonth = workDate.getDayOfMonth();
+                daysList.set(dayOfMonth - 1, a.getAttendanceStatusCode());
+            }
+            ar.setDays(daysList);
+
+            // 4-6) 월 근태리스트 셋팅 끝난 사원 >  resultList에 추가
+            // [{ name: '홍길동', daysList: ['출', '-', '-', '연차' ] }]
+            resultList.add(ar);
 		}
 
 
 
-		// 5. Summary 뽑기
+		// 5. Summary 뽑기 (개발보류)
 
-		// 6.
-
-		return null;
+		return resultList;
 	}
 
 	// 조퇴처리

@@ -90,6 +90,24 @@
         and employee_id = #{employeeId}
     </select>
 
+    <select id="getAttendanceListByPeriod">
+        select *
+            from attendance a
+        left join employee e
+        on e.employee_id = a.employee_id
+        left join department d
+        on e.department_id = d.department_id
+
+        where a.work_date >= #{startMonth}
+        <![CDATA[
+          AND a.work_date < #{endMonth}
+        ]]>
+        and a.employee_id = #{employeeId}
+        <if test="departmentName != null and departmentName != '전체'">
+            and d.department_name = #{departmentName}
+        </if>
+    </select>
+
 <!--    <insert-->
 <!--        id="addInfo"-->
 <!--        parameterType="EmployeeCareerAddInfoRequest"-->

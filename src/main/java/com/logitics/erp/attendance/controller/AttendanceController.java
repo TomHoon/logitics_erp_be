@@ -87,8 +87,8 @@ public class AttendanceController {
 
 	@GetMapping("/monthly")
 	@Operation(summary = "월근태현황조회")
-	public List<AttendanceResultResponse> getMonthly(@RequestParam(required = false) LocalDate findDate) {
-		return attendanceService.getMonthly(findDate);
+	public List<AttendanceResultResponse> getMonthly(AttendanceMonthlyRequest request) {
+		return attendanceService.getMonthly(request);
 	}
 
 //	@GetMapping("/late/checkin")

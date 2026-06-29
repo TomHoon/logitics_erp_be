@@ -58,5 +58,15 @@
         limit #{size} offset #{offset}
     </select>
 
+    <select id="getEmployeeListByDepartmentName">
+        select * from employee e
+        left join department d
+        on d.department_id = e.department_id
+        where 1=1
+        <if test="departmentName != null and departmentName != '전체'">
+            and e.department_name = #{departmentName}
+        </if>
+    </select>
+
 
 </mapper>

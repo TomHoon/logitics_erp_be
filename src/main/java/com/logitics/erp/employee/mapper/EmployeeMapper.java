@@ -16,4 +16,6 @@ public interface EmployeeMapper {
 					@Param("offset") int offset,
 					@Param("request") SearchEmployeeRequest request
 	);
+
+    List<Employee> getEmployeeListByDepartmentName(String departmentName);
 }
