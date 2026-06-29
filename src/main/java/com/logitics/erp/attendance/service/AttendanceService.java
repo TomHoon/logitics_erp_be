@@ -280,6 +280,9 @@ public class AttendanceService {
 		LeaveType lt = leaveTypeRepository.findByLeaveTypeName("연차").get(0);
 
 		Long days = ChronoUnit.DAYS.between(request.getStartDate(), request.getEndDate());
+		if (days < 0) {
+			throw new IllegalArgumentException("잘못된 파라미터입니다.");
+		}
 
 		// 1. 신청내역추가
 		LeaveRequest lr = LeaveRequest

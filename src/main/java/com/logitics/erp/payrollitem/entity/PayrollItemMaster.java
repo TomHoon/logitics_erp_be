@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
-public class payrollItemMaster extends BaseEntity{
+public class PayrollItemMaster extends BaseEntity{
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -23,4 +23,15 @@ public class payrollItemMaster extends BaseEntity{
 	private Boolean taxable = true;
 	private Boolean fixed = false;
 
+	public PayrollItemMaster(
+			String itemName,
+			String itemTypeCode,
+			boolean taxable,
+			boolean fixed
+	) {
+		this.itemName = itemName;
+		this.itemTypeCode = itemTypeCode;
+		this.taxable = taxable;
+		this.fixed = fixed;
+	}
 }

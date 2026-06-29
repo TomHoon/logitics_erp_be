@@ -9,7 +9,7 @@
         left join attendance a
             on a.employee_id = lb.employee_id
             and a.work_date = CURDATE()
-        where a.employee_id = #{employeeId}
+        where lb.employee_id = #{employeeId}
     </select>
 
 </mapper>

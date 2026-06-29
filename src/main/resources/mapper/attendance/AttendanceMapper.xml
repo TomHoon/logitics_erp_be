@@ -108,6 +108,16 @@
         </if>
     </select>
 
+    <select id="getAttendanceByMonth">
+        select * from attendance a
+        where employee_id = #{employeeId}
+        and work_date >= #{startMonth}
+        <![CDATA[
+          AND a.work_date < #{endMonth}
+        ]]>
+
+    </select>
+
 <!--    <insert-->
 <!--        id="addInfo"-->
 <!--        parameterType="EmployeeCareerAddInfoRequest"-->

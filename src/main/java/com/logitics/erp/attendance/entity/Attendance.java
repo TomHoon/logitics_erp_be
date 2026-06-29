@@ -17,7 +17,6 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Getter
 @Builder
-
 public class Attendance extends BaseEntity {
 
 	@Id

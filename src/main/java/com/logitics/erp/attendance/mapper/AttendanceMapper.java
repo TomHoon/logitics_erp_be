@@ -21,4 +21,6 @@ public interface AttendanceMapper {
     List<Attendance> findDataBySpecificDate(LocalDate findDate, Long employeeId);
 
     List<Attendance> getAttendanceListByPeriod(LocalDate startMonth, LocalDate endMonth, Long employeeId, String departmentName);
+
+	List<Attendance> getAttendanceByMonth(LocalDate startMonth, LocalDate endMonth, Long employeeId);
 }

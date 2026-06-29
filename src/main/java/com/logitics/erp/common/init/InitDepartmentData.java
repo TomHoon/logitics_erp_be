@@ -4,10 +4,12 @@ import com.logitics.erp.department.entity.Department;
 import com.logitics.erp.department.repository.DepartmentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
+@Order(value = 1)
 public class InitDepartmentData implements CommandLineRunner {
 
 	private final DepartmentRepository departmentRepository;

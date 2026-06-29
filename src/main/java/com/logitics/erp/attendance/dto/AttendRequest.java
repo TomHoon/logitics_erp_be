@@ -1,12 +1,14 @@
 package com.logitics.erp.attendance.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Builder;
 import lombok.Data;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Data
+@Builder
 public class AttendRequest {
 
 	private String employeeNo;
