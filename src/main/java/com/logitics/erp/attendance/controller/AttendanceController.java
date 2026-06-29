@@ -3,6 +3,7 @@ package com.logitics.erp.attendance.controller;
 import com.logitics.erp.attendance.dto.*;
 import com.logitics.erp.attendance.entity.Attendance;
 import com.logitics.erp.attendance.service.AttendanceService;
+import com.logitics.erp.employee.entity.Employee;
 import com.logitics.erp.employee.repository.EmployeeRepository;
 import com.logitics.erp.leaverequest.entity.LeaveRequest;
 import io.swagger.v3.oas.annotations.Operation;
@@ -22,6 +23,14 @@ public class AttendanceController {
 
 	private final AttendanceService attendanceService;
 	private final EmployeeRepository employeeRepository;
+
+    @GetMapping("/info")
+    @Operation(summary = "최초진입시 근태 정보 조회")
+    public AttendBasicInfoResponse getBasicInfo(Authentication authentication) {
+        String email = authentication.getName();
+        String employeeNo = employeeRepository.findByEmail(email).orElseThrow(() -> null).getEmployeeNo();
+        return attendanceService.getBasicInfo(employeeNo);
+    }
 
 	@PostMapping("/checkin")
 	@Operation(summary = "출근등록")
@@ -56,7 +65,7 @@ public class AttendanceController {
 
 		String leaveType = request.getLeaveType();
 
-		if (!leaveType.equals("종일")) {
+		if (!leaveType.equals("연차")) {
 			throw new IllegalArgumentException("현재는 종일 연차만 가능합니다.");
 		}
 
@@ -68,11 +77,11 @@ public class AttendanceController {
 
 	@GetMapping("/daily")
 	@Operation(summary = "일일근태리스트조회")
-	public List<AttendanceDailyResponse> getAttendanceDaily(@RequestParam(required = false) String findDate) {
-		if (findDate == null) {
-			findDate = LocalDate.now().toString();
+	public List<AttendanceDailyResponse> getAttendanceDaily(AttendanceDailyRequest request) {
+		if (request.getFindDate() == null) {
+            request.setFindDate(LocalDate.now().toString());
 		}
-		List<AttendanceDailyResponse> list = attendanceService.getAttendanceDaily(findDate);
+		List<AttendanceDailyResponse> list = attendanceService.getAttendanceDaily(request);
 		return list;
 	}
 

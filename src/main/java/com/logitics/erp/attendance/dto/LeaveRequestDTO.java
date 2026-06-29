@@ -23,7 +23,7 @@ public class LeaveRequestDTO {
     @Schema(description = "연차종료", example = "2026-06-10")
     private LocalDate endDate;
 
-    @Schema(description = "연차구분", example = "종일/오전/오후")
+    @Schema(description = "연차구분", example = "연차/오전/오후")
     private String leaveType;
 
     @Schema(description = "사유", example = "개인사유")

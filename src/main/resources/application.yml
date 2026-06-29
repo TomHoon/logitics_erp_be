@@ -32,3 +32,7 @@ server:
 
 file:
   upload-dir: uploads
+
+attendance:
+  start-time: "09:00"
+  end-time: "18:00"

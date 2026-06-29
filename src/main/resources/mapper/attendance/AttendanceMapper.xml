@@ -33,7 +33,7 @@
             from attendance a
             where 1=1
             <if test="findDate != null">
-                and DATE(a.created_at) = #{findDate}
+                and DATE(a.work_date) = #{findDate}
             </if>
         ) a
         on a.employee_id = e.employee_id
@@ -41,6 +41,13 @@
         on e.position_id = p.position_id
         left join department d
         on e.department_id= d.department_id
+        where 1=1
+        <if test="keyword != null">
+            and e.name like CONCAT('%', #{keyword}, '%')
+        </if>
+        <if test="departmentName != null and departmentName != '전체'">
+            and d.department_name = #{departmentName}
+        </if>
     </select>
 
     <select id="getAttendanceInfoList">
@@ -76,6 +83,11 @@
         and employee_id = #{employeeId}
 
 
+    </select>
+    <select id="findDataBySpecificDate">
+        select * from attendance
+        where work_date = #{findDate}
+        and employee_id = #{employeeId}
     </select>
 
 <!--    <insert-->

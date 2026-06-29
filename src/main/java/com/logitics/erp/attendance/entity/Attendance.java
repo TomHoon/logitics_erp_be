@@ -66,4 +66,8 @@ public class Attendance extends BaseEntity {
 	public void setEmployee(Employee e) {
 		this.employee = e;
 	}
+
+    public void setComment(String comment) {
+        this.comment = comment;
+    }
 }

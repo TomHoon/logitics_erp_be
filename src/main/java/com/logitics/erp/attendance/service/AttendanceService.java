@@ -8,6 +8,7 @@ import com.logitics.erp.attendance.util.AttendanceProperty;
 import com.logitics.erp.employee.entity.Employee;
 import com.logitics.erp.employee.repository.EmployeeRepository;
 import com.logitics.erp.leavebalance.entity.LeaveBalance;
+import com.logitics.erp.leavebalance.mapper.LeaveBalanceMapper;
 import com.logitics.erp.leavebalance.repository.LeaveBalanceRepository;
 import com.logitics.erp.leaverequest.entity.LeaveRequest;
 import com.logitics.erp.leaverequest.repository.LeaveRequestRepository;
@@ -40,6 +41,7 @@ public class AttendanceService {
 	private final LeaveRequestRepository leaveRequestRepository;
 	private final LeaveTypeRepository leaveTypeRepository;
 	private final LeaveBalanceRepository leaveBalanceRepository;
+    private final LeaveBalanceMapper leaveBalanceMapper;
 
 	@Transactional
 	public AttendResponse attend(AttendRequest attendRequest) {
@@ -87,12 +89,9 @@ public class AttendanceService {
 		return attendanceMapper.getMonthAttendance(size, offset, departmentId, startDate, endDate);
 	}
 
-	public List<AttendanceDailyResponse> getAttendanceDaily(String findDate) {
+	public List<AttendanceDailyResponse> getAttendanceDaily(AttendanceDailyRequest request) {
 
-		if (findDate == null) {
-			findDate = LocalDate.now().toString();
-		}
-		List<AttendanceDailyResponse> list = attendanceMapper.getAttendanceDaily(findDate);
+		List<AttendanceDailyResponse> list = attendanceMapper.getAttendanceDaily(request);
 		return list;
 	}
 
@@ -189,6 +188,7 @@ public class AttendanceService {
 	}
 
 	// 조퇴처리
+    @Transactional
 	public Map<String, String> earlyLeave(EarlyLeaveRequest request) {
 		// 1. 조퇴시간 변환(LocalTime으로) ex) 14:00
 		LocalTime earlyCheckoutTime = request.getEarlyLeaveTime().toLocalTime();
@@ -197,10 +197,16 @@ public class AttendanceService {
 		Employee e = employeeRepository.findByEmployeeNo(request.getEmployeeNo())
 				.orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사원입니다."));
 
-		// 2. 이미 출근한 출근 데이터 찾기
-		Attendance a = attendanceRepository
-				.findByEmployee(e)
-				.orElseThrow(() -> new IllegalArgumentException("출근하지 않은 사원입니다."));
+		// 2. 이미 출근한 출근 데이터 찾기(현재일자)
+//		Attendance a = attendanceRepository
+//				.findByEmployee(e)
+//				.orElseThrow(() -> new IllegalArgumentException("출근하지 않은 사원입니다."));
+
+        Attendance a = attendanceMapper.findTodayAttendance(e.getEmployeeId(), LocalDate.now());
+
+        if (a == null) {
+            throw new IllegalArgumentException("출근하지 않은 사원입니다.");
+        }
 		
 		// 3. 퇴근시간을 조퇴시간으로 설정
 		a.setCheckOutTime(request.getEarlyLeaveTime());
@@ -213,6 +219,12 @@ public class AttendanceService {
 		long noWorkTime = Duration.between(earlyCheckoutTime, endTime).toMinutes();
 		a.setEarlyLeaveMinutes(noWorkTime);
 
+        // 6. 조퇴사유 내용 저장
+        a.setComment(request.getReason());
+
+        // 7. JPA로 호출하지 않아 Employee 엔티티 누락된거 넣어주기
+        a.setEmployee(e);
+
 		attendanceRepository.save(a);
 		
 		return Map.of("결과", "true", "내용", "조퇴처리완료");
@@ -220,6 +232,7 @@ public class AttendanceService {
 
 
 	// 휴가 신청
+    @Transactional
 	public Map<String, String> requestLeave(LeaveRequestDTO request) {
 
 		/**
@@ -266,7 +279,14 @@ public class AttendanceService {
 
 		for (LocalDate d : list) {
 
-			// 3.1) 근태등록 안되어 있으면 추가
+            // 3.1) 해당일자에 이미 출근데이터 있으면 에러
+            List<Attendance> specificDateList = attendanceMapper.findDataBySpecificDate(d, e.getEmployeeId());
+
+            if (specificDateList != null && specificDateList.size() > 0) {
+                throw new IllegalArgumentException("이미 휴가신청한 날짜에 근태(휴가 또는 출근)가 등록되어있습니다.");
+            }
+
+			// 3.2) 근태등록 안되어 있으면 추가
 			Attendance leaveAttendance = Attendance
 					.builder()
 					.employee(e)
@@ -278,9 +298,16 @@ public class AttendanceService {
 		}
 
 		return Map.of("결과", "true", "내용", "연차처리가 정상 등록되었습니다.");
-
-
-
 	}
+
+    public AttendBasicInfoResponse getBasicInfo(String employeeNo) {
+
+        // 1. employee 조회
+        Employee e = employeeRepository.findByEmployeeNo(employeeNo).orElseThrow(() -> new IllegalArgumentException("회원정보가 없습니다."));
+
+        // 2. 해당 사원의 휴가 정보 조회
+        Long employeeId = e.getEmployeeId();
+        return leaveBalanceMapper.getBasicInfo(employeeId);
+    }
 }
 

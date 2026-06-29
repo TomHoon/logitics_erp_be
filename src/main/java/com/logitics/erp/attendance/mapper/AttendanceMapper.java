@@ -1,9 +1,6 @@
 package com.logitics.erp.attendance.mapper;
 
-import com.logitics.erp.attendance.dto.AttendResponse;
-import com.logitics.erp.attendance.dto.AttendanceDailyResponse;
-import com.logitics.erp.attendance.dto.AttendanceInfoListResponse;
-import com.logitics.erp.attendance.dto.AttendanceResultResponse;
+import com.logitics.erp.attendance.dto.*;
 import com.logitics.erp.attendance.entity.Attendance;
 
 import java.time.LocalDate;
@@ -13,11 +10,13 @@ import java.util.Map;
 public interface AttendanceMapper {
 	List<AttendanceResultResponse> getMonthAttendance(int size, int offset, Long departmentId, String startDate, String endDate);
 
-	List<AttendanceDailyResponse> getAttendanceDaily(String findDate);
+	List<AttendanceDailyResponse> getAttendanceDaily(AttendanceDailyRequest request);
 
 	List<AttendanceInfoListResponse> getAttendanceInfoList(String findDate);
 
 	Map<String, Object> getSummaryByEmployee(LocalDate findDate, Long employeeId);
 
 	Attendance findTodayAttendance(Long employeeId, LocalDate now);
+
+    List<Attendance> findDataBySpecificDate(LocalDate findDate, Long employeeId);
 }
