@@ -29,7 +29,6 @@ public class InitEmployeeData implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
         if (employeeRepository.count() > 0) return;
-
         createUserData();
     }
 
@@ -47,7 +46,8 @@ public class InitEmployeeData implements CommandLineRunner {
                 new TestUser("예린", "yerin@naver.com"),
                 new TestUser("정민", "jungmin@naver.com"),
                 new TestUser("민성", "minsung@naver.com"),
-                new TestUser("하진", "hajin@naver.com")
+                new TestUser("하진", "hajin@naver.com"),
+                new TestUser("동훈", "dh@naver.com")
         );
 
         Position p = positionRepository.findById(1L).orElseThrow();

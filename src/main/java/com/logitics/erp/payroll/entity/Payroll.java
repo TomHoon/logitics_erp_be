@@ -2,8 +2,11 @@ package com.logitics.erp.payroll.entity;
 
 import com.logitics.erp.common.entity.BaseEntity;
 import com.logitics.erp.employee.entity.Employee;
+import com.logitics.erp.payroll.dto.PayrollStatusCode;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -14,6 +17,7 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
+@Builder
 public class Payroll extends BaseEntity {
 
 	@Id
@@ -25,8 +29,9 @@ public class Payroll extends BaseEntity {
 	private Employee employee;
 
 	@Column(nullable = false)
-	private String payrollYearMonth;
+	private int payrollYearMonth;
 
+    @Schema(description = "급여일")
 	private LocalDate paymentDate;
 
 	@Column(nullable = false)
@@ -39,7 +44,9 @@ public class Payroll extends BaseEntity {
 	private BigDecimal realPayAmount = BigDecimal.ZERO;
 
 	@Column(length = 50)
-	private String payrollStatusCode;
+    @Enumerated(EnumType.STRING)
+    @Builder.Default
+    private PayrollStatusCode payrollStatusCode = PayrollStatusCode.DRAFT;
 
 	@Column(length = 100)
 	private String employeeNameSnapshot;

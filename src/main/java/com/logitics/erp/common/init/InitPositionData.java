@@ -19,7 +19,7 @@ public class InitPositionData implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
 
-        if (positionRepository.count() > 0) {
+        if (positionRepository.count() > 1) {
             return;
         }
 
