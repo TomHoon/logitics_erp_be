@@ -12,6 +12,9 @@ import lombok.NoArgsConstructor;
 @Schema(description = "급여지급 정보")
 public class PayrollResponse {
 
+    @Schema(description = "급여명세고유번호", example = "5001")
+    private String payrollId;
+    
     @Schema(description = "사원번호", example = "T9950")
     private String employeeNo;
 

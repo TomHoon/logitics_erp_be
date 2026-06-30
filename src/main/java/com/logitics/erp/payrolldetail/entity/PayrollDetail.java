@@ -31,4 +31,8 @@ public class PayrollDetail {
 	private String itemTypeCodeSnapshot;
     private int amount;
 
+	public void setAmount(int amount) {
+		this.amount = amount;
+	}
+
 }

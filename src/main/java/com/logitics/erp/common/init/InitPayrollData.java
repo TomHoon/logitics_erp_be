@@ -105,7 +105,7 @@ public class InitPayrollData implements CommandLineRunner {
             Payroll newDhPayroll = Payroll
                     .builder()
                     .employee(dhEmp)
-                    .payrollYearMonth(Integer.parseInt(String.format("%02d", LocalDate.now().getYear(), LocalDate.now().getMonthValue())))
+                    .payrollYearMonth(Integer.parseInt(String.format("%d%02d", LocalDate.now().getYear(), LocalDate.now().getMonthValue())))
                     .paymentDate(LocalDate.of(2026, 6, 25))
                     .employeeNameSnapshot(dhEmp.getName())
                     .departmentNameSnapshot(dept.getDepartmentName())
