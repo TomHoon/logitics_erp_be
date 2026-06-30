@@ -26,6 +26,7 @@ public class PayrollController {
         return payrollService.getList(request);
     }
 
+    @Operation(description = "특정 사원의 기본급 수정")
     @PatchMapping("/{payrollId}/basic-salary")
     public UpdateBasicSalaryResponse updateBasicSalary(@PathVariable Long payrollId, @RequestBody UpdateBasicSalaryRequest request) {
         return payrollService.updateBasicSalary(payrollId, request);

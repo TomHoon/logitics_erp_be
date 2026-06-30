@@ -72,6 +72,9 @@ public class InitEmployeeData implements CommandLineRunner {
                     .address("서울시 테스트구 " + i)
                     .employeeStatusCode("재직")
                     .department(department)
+                    .bankName("농협")
+                    .accountHolder(list.get(i).name())
+                    .accountNumber("339-910124-24707")
                     .password(passwordEncoder.encode("1234"))
                     .position(p)
                     .build();

@@ -46,7 +46,7 @@ public class PayrollResponse {
     private String bankName;
 
     @Schema(description = "계좌번호", example = "123-456-789012")
-    private String bankAccountNumber;
+    private String accountNumber;
 
     public PayrollResponse(Payroll p) {
         this.employeeNo = p.getEmployee().getEmployeeNo();
