@@ -70,7 +70,7 @@ public class InitPayrollData implements CommandLineRunner {
 //            throw new IllegalArgumentException("해당 회원 존재하지 않습니다.");
         }
 
-        Payroll dhPayroll = payrollRepository.findByEmployee_EmployeeIdAndPayrollYearMonth(dhEmp.getEmployeeId(), 202606).orElse(null);
+        Payroll dhPayroll = payrollRepository.findByEmployee_EmployeeIdAndPayrollYearMonth(dhEmp.getEmployeeId(), Integer.parseInt(String.format("%d%02d", LocalDate.now().getYear(), LocalDate.now().getMonthValue()))).orElse(null);
 
         if (dhPayroll != null) {
             // 이미 존재한다면 얼리리턴

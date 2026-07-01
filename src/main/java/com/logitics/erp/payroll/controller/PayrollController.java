@@ -1,9 +1,6 @@
 package com.logitics.erp.payroll.controller;
 
-import com.logitics.erp.payroll.dto.PayrollRequest;
-import com.logitics.erp.payroll.dto.PayrollResponse;
-import com.logitics.erp.payroll.dto.UpdateBasicSalaryRequest;
-import com.logitics.erp.payroll.dto.UpdateBasicSalaryResponse;
+import com.logitics.erp.payroll.dto.*;
 import com.logitics.erp.payroll.service.PayrollService;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
@@ -30,6 +27,12 @@ public class PayrollController {
     @PatchMapping("/{payrollId}/basic-salary")
     public UpdateBasicSalaryResponse updateBasicSalary(@PathVariable Long payrollId, @RequestBody UpdateBasicSalaryRequest request) {
         return payrollService.updateBasicSalary(payrollId, request);
+    }
+
+    @Operation(description = "상단 status 조회")
+    @GetMapping("/status")
+    public PayrollStatusResponse getPayrollStatus() {
+        return payrollService.getPayrollStatus();
     }
 
 

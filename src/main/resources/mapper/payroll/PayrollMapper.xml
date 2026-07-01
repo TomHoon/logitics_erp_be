@@ -34,5 +34,49 @@
         and payroll_id = #{payrollId}
     </select>
 
+    <!-- 급여기본정보관리 > (평균기본급, 최고기본급, 최고기본급사원명, 총기본급) 조회-->
+    <select id="getPayrollStatusBasicInfo">
+        select
+            avg(pd.amount) as average_basic_salary,
+            max(pd.amount) as max_basic_salary,
+            sum(pd.amount)as total_basic_salary_amount,
+            e.name as max_basic_salary_employee_name,
+            pos.position_name as max_basic_salary_employee_position_name
+        from payroll p
+            left join payroll_detail pd
+                on pd.payroll_id = p.payroll_id
+            left join employee e
+                on e.employee_id = p.employee_id
+            left join positions pos
+                on e.position_id = pos.position_id
+        where p.payroll_year_month = #{payrollYearMonth}
+            and pd.item_name_snapshot = '기본급'
+
+    </select>
+
+    <!-- 급여기본정보관리 > (총수당) 조회-->
+    <select id="getTotalAllowance">
+        select
+            sum(pd.amount)as total_allowance_amount
+        from payroll p
+            left join payroll_detail pd
+                on pd.payroll_id = p.payroll_id
+            left join employee e
+                on e.employee_id = p.employee_id
+            where p.payroll_year_month = #{payrollYearMonth}
+                and pd.item_name_snapshot not in ('기본급')
+    </select>
+
+    <!-- 급여기본정보관리 > (전월대비증감액) 조회-->
+    <select id="getCompareLastMonthAmount">
+        select
+            COALESCE(avg(case when p.payroll_year_month = #{payrollYearMonth} then pd.amount else 0 end)) -
+            COALESCE(avg(case when p.payroll_year_month = #{payrollLastYearMonth} then pd.amount else 0 end)) as compareLastMonthAmount
+        from payroll p
+            left join payroll_detail pd
+                on p.payroll_id = pd.payroll_id
+            where p.payroll_year_month in (#{payrollYearMonth}, #{payrollLastYearMonth})
+            and pd.item_name_snapshot = '기본급'
+    </select>
 
 </mapper>
