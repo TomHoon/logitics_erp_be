@@ -35,5 +35,14 @@ public class PayrollController {
         return payrollService.getPayrollStatus();
     }
 
+    @Operation(description = "급여정보등록 사원조회")
+    @GetMapping("/register/employees")
+    public List<EmployeeListPayrollResponse> getEmployeeListPayroll(EmployeeListPayrollRequest request) {
+
+        return payrollService.getEmployeeListPayroll(request);
+    }
+
+
+
 
 }

@@ -1,8 +1,6 @@
 package com.logitics.erp.payroll.mapper;
 
-import com.logitics.erp.payroll.dto.PayrollRequest;
-import com.logitics.erp.payroll.dto.PayrollResponse;
-import com.logitics.erp.payroll.dto.PayrollStatusResponse;
+import com.logitics.erp.payroll.dto.*;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -17,4 +15,6 @@ public interface PayrollMapper {
     Long getCompareLastMonthAmount(int payrollYearMonth, int payrollLastYearMonth);
 
     Long getTotalAllowance(int payrollYearMonth);
+
+    List<EmployeeListPayrollResponse> getEmployeeListPayroll(EmployeeListPayrollRequest request);
 }

@@ -79,4 +79,41 @@
             and pd.item_name_snapshot = '기본급'
     </select>
 
+    <select id="getEmployeeListPayroll">
+        select
+            pos.position_name,
+            d.department_name,
+            e.name,
+            e.employee_no,
+            coalesce(e.hire_date, e.created_at) as hire_date,
+            max(case when pd.item_name_snapshot = '기본급' then pd.amount else 0 end) as basic_salary,
+            max(case when pd.item_name_snapshot = '식대' then pd.amount else 0 end) as meal_allowance,
+            max(case when pd.item_name_snapshot = '교통비' then pd.amount else 0 end) as transportation_allowance,
+            max(case when pd.item_name_snapshot = '직책수당' then pd.amount else 0 end) as responsibility_allowance,
+            p.payment_date
+        from employee e
+            left join payroll p
+                on e.employee_id = p.employee_id
+            left join department d
+                on e.department_id= d.department_id
+            left join positions pos
+                on pos.position_id = e.position_id
+            left join payroll_detail pd
+                on pd.payroll_id = p.payroll_id
+        where 1=1
+            <if test="name != null and name != ''">
+                and e.name like concat('%', #{name}, '%')
+            </if>
+            <if test="departmentName != null and departmentName != '' and departmentName != '전체'">
+                and d.department_name like concat('%', #{departmentName}, '%')
+            </if>
+        group by
+            pos.position_name,
+            e.name,
+            e.employee_no,
+            e.hire_date,
+            e.created_at
+
+    </select>
+
 </mapper>

@@ -1,5 +1,8 @@
 package com.logitics.erp.payroll.service;
 
+import com.logitics.erp.department.entity.Department;
+import com.logitics.erp.department.repository.DepartmentRepository;
+import com.logitics.erp.employee.entity.Employee;
 import com.logitics.erp.employee.repository.EmployeeRepository;
 import com.logitics.erp.payroll.dto.*;
 import com.logitics.erp.payroll.entity.Payroll;
@@ -11,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -22,6 +26,7 @@ public class PayrollService {
     private final PayrollDetailRepository payrollDetailRepository;
     private final PayrollMapper payrollMapper;
     private final EmployeeRepository employeeRepository;
+    private final DepartmentRepository departmentRepository;
 
     public List<PayrollResponse> getList(PayrollRequest request) {
         int todayYear = LocalDate.now().getYear();
@@ -69,5 +74,23 @@ public class PayrollService {
         basicResponse.setTotalAllowanceAmount(totalAllowance);
 
         return basicResponse;
+    }
+
+    public List<EmployeeListPayrollResponse> getEmployeeListPayroll(EmployeeListPayrollRequest request) {
+
+        // 1. 사원명 조회
+        List<Employee> empList = employeeRepository.findByNameContaining(request.getName());
+
+        if (request.getName() != null && empList.size() <= 0) {
+            return Collections.emptyList();
+        }
+
+        // 2. 부서명 조회
+        Department department = departmentRepository.findByDepartmentName(request.getDepartmentName()).orElse(null);
+        if (request.getDepartmentName() != "" && request.getDepartmentName() != "전체" && request.getDepartmentName() != null && department == null) {
+            return Collections.emptyList();
+        }
+
+        return payrollMapper.getEmployeeListPayroll(request);
     }
 }
