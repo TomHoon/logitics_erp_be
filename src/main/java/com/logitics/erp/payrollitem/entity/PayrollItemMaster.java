@@ -3,6 +3,7 @@ package com.logitics.erp.payrollitem.entity;
 import com.logitics.erp.common.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -10,6 +11,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
+@Builder
 public class PayrollItemMaster extends BaseEntity{
 
 	@Id

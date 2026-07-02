@@ -136,4 +136,10 @@
 
     </update>
 
+    <select id="findPayrollCurrent">
+        select count(*) from payroll
+        where employee_id = #{employeeId}
+        and payroll_year_month = #{payrollYearMonth}
+    </select>
+
 </mapper>

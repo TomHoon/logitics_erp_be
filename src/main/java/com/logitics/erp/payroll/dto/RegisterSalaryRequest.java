@@ -13,16 +13,16 @@ public class RegisterSalaryRequest {
     private String employeeNo;
 
     @Schema(description = "기본급(원)", example = "3200000")
-    private Long basicSalary;
+    private int basicSalary;
 
     @Schema(description = "식대(원)", example = "200000")
-    private Long mealAllowance;
+    private int mealAllowance;
 
     @Schema(description = "교통비(원)", example = "100000")
-    private Long transportationAllowance;
+    private int transportationAllowance;
 
     @Schema(description = "직급수당(원)", example = "300000")
-    private Long responsibilityAllowance;
+    private int responsibilityAllowance;
 
     @Schema(description = "급여 지급일", example = "25일")
     private String paymentDate;

@@ -19,4 +19,6 @@ public interface PayrollMapper {
     List<EmployeeListPayrollResponse> getEmployeeListPayroll(EmployeeListPayrollRequest request);
 
     int updateSalary(RegisterSalaryRequest request);
+
+    int findPayrollCurrent(Long employeeId, int payrollYearMonth);
 }

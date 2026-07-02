@@ -10,6 +10,8 @@ import com.logitics.erp.payroll.mapper.PayrollMapper;
 import com.logitics.erp.payroll.repository.PayrollRepository;
 import com.logitics.erp.payrolldetail.entity.PayrollDetail;
 import com.logitics.erp.payrolldetail.repository.PayrollDetailRepository;
+import com.logitics.erp.payrollitem.entity.PayrollItemMaster;
+import com.logitics.erp.payrollitem.repository.PayrollItemMasterRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -27,6 +29,7 @@ public class PayrollService {
     private final PayrollMapper payrollMapper;
     private final EmployeeRepository employeeRepository;
     private final DepartmentRepository departmentRepository;
+    private final PayrollItemMasterRepository payrollItemMasterRepository;
 
     public List<PayrollResponse> getList(PayrollRequest request) {
         int todayYear = LocalDate.now().getYear();
@@ -118,15 +121,81 @@ public class PayrollService {
         int yearMonth = Integer.parseInt(String.format("%d%02d", LocalDate.now().getYear(), LocalDate.now().getMonthValue()));
         request.setPayrollYearMonth(yearMonth);
 
+        int selectedPayementDate = paymentDate.equals("25일") ? 25 : 10;
+
+        // 3. 당월 급여명세 없는 경우 추가
+        int countOfPayrollByEmployee = payrollMapper.findPayrollCurrent(employeeId, yearMonth);
+        if (countOfPayrollByEmployee <= 0) {
+            // 3.1) 급여명세 데이터 추가
+            Payroll newPayroll = Payroll
+                    .builder()
+                    .employee(emp)
+                    .payrollYearMonth(yearMonth)
+                    .paymentDate(LocalDate.of(LocalDate.now().getYear(), LocalDate.now().getMonthValue(), selectedPayementDate))
+                    .employeeNameSnapshot(emp.getName())
+                    .departmentNameSnapshot(emp.getDepartment().getDepartmentName())
+                    .positionNameSnapshot(emp.getPosition().getPositionName())
+                    .build();
+
+            Payroll savedPayroll = payrollRepository.save(newPayroll);
+
+            // 3.2) 기본급, 직급수당, 식대, 교통비 항목 추가
+            // 3.2.1) 기본급 추가
+            PayrollItemMaster basicPim = payrollItemMasterRepository.findByItemName("기본급");
+            PayrollDetail basicPd = PayrollDetail
+                    .builder()
+                    .payroll(savedPayroll)
+                    .payrollItemMaster(basicPim)
+                    .itemNameSnapshot("기본급")
+                    .itemTypeCodeSnapshot("PAY")
+                    .amount(request.getBasicSalary())
+                    .build();
+
+            // 3.2.2) 직급수당 추가
+            PayrollItemMaster responsibilityPim = payrollItemMasterRepository.findByItemName("직급수당");
+            PayrollDetail responsibilityPd = PayrollDetail
+                    .builder()
+                    .payroll(savedPayroll)
+                    .payrollItemMaster(responsibilityPim)
+                    .itemNameSnapshot("직급수당")
+                    .itemTypeCodeSnapshot("PAY")
+                    .amount(request.getResponsibilityAllowance())
+                    .build();
+
+            // 3.2.3) 식대 추가
+            PayrollItemMaster mealPim = payrollItemMasterRepository.findByItemName("식대");
+            PayrollDetail mealPd = PayrollDetail
+                    .builder()
+                    .payroll(savedPayroll)
+                    .payrollItemMaster(mealPim)
+                    .itemNameSnapshot("식대")
+                    .itemTypeCodeSnapshot("PAY")
+                    .amount(request.getMealAllowance())
+                    .build();
+
+            // 3.2.4) 교통비 추가
+            PayrollItemMaster transportationPim = payrollItemMasterRepository.findByItemName("교통비");
+            PayrollDetail transportationPd = PayrollDetail
+                    .builder()
+                    .payroll(savedPayroll)
+                    .payrollItemMaster(transportationPim)
+                    .itemNameSnapshot("교통비")
+                    .itemTypeCodeSnapshot("PAY")
+                    .amount(request.getTransportationAllowance())
+                    .build();
+
+            payrollDetailRepository.saveAll(List.of(basicPd, responsibilityPd, mealPd, transportationPd));
+
+            return Map.of("결과", "성공");
+        }
+
+
+        // 4. 이미 급여명세가 존제한 경우 Update 처리
         int result = payrollMapper.updateSalary(request);
         if (result > 0) {
             return Map.of("결과", "성공");
         }
 
-
-        // 3.
         return Map.of("결과", "실패");
-
-
     }
 }
