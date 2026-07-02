@@ -42,7 +42,11 @@ public class PayrollController {
         return payrollService.getEmployeeListPayroll(request);
     }
 
+    @Operation(description = "급여정보 등록/수정")
+    @PostMapping("/register/employees")
+    public Map<String, String> registerSalary(@RequestBody RegisterSalaryRequest request) {
 
-
+        return payrollService.registerSalary(request);
+    }
 
 }

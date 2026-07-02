@@ -116,4 +116,24 @@
 
     </select>
 
+    <update id="updateSalary">
+        <!--특정 사원의 당월 급여 데이터 수정(기본급, 식비, 교통비, 직책수당)-->
+        update payroll_detail pd
+        join payroll p
+            on p.payroll_id = pd.payroll_id
+        set pd.amount =
+            case
+                pd.item_name_snapshot
+            when '기본급' then #{basicSalary}
+            when '식대' then #{mealAllowance}
+            when '교통비' then #{transportationAllowance}
+            when '직책수당' then #{responsibilityAllowance}
+                else
+                    pd.amount
+            END
+        where p.employee_id = #{employeeId}
+            and p.payroll_year_month = #{payrollYearMonth}
+
+    </update>
+
 </mapper>

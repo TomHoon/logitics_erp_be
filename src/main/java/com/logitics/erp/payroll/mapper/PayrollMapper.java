@@ -17,4 +17,6 @@ public interface PayrollMapper {
     Long getTotalAllowance(int payrollYearMonth);
 
     List<EmployeeListPayrollResponse> getEmployeeListPayroll(EmployeeListPayrollRequest request);
+
+    int updateSalary(RegisterSalaryRequest request);
 }

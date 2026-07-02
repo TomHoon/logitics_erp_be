@@ -93,4 +93,40 @@ public class PayrollService {
 
         return payrollMapper.getEmployeeListPayroll(request);
     }
+
+    public Map<String, String> registerSalary(RegisterSalaryRequest request) {
+        // 사원 ID 먼저 뽑기
+        String employeeNo = request.getEmployeeNo();
+        Employee emp = employeeRepository.findByEmployeeNo(employeeNo).orElse(null);
+
+        if (emp == null) {
+            throw new IllegalArgumentException("해당하는 사원 정보가 없습니다.");
+        }
+
+        Long employeeId = emp.getEmployeeId();
+
+        request.setEmployeeId(employeeId);
+
+        // 1. 급여지급일 (25일 || 10일) 둘 중 하나인지 확인
+        String paymentDate = request.getPaymentDate();
+        if (paymentDate == null || (!paymentDate.equals("10일") && !paymentDate.equals("25일"))) {
+            throw new IllegalArgumentException("올바른 지급일자가 아닙니다. ex) 25일 or 10일 ");
+        }
+
+        // 2. 기본급, 직급수당, 식대, 교통비, 급여지급일 수정
+        // 2.1) 당월 년월 뽑기
+        int yearMonth = Integer.parseInt(String.format("%d%02d", LocalDate.now().getYear(), LocalDate.now().getMonthValue()));
+        request.setPayrollYearMonth(yearMonth);
+
+        int result = payrollMapper.updateSalary(request);
+        if (result > 0) {
+            return Map.of("결과", "성공");
+        }
+
+
+        // 3.
+        return Map.of("결과", "실패");
+
+
+    }
 }
