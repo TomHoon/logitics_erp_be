@@ -12,6 +12,7 @@ import com.logitics.erp.position.repository.PositionRepository;
 import io.micrometer.common.util.StringUtils;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -26,6 +27,7 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class EmployeeService {
 
 	private final EmployeeRepository employeeRepository;
@@ -39,6 +41,9 @@ public class EmployeeService {
 
     @Value("${server.frontend-url}")
     private String frontendUrl;
+
+    @Value("${server.client-id}")
+    private String clientId;
 
 
     public void createEmployeeTest() {
@@ -271,7 +276,7 @@ public class EmployeeService {
                 .uri("https://kauth.kakao.com/oauth/token")
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .body("grant_type=authorization_code" +
-                        "&client_id=" + "1b4c104820c24e95dbbf14b7f532b909" +
+                        "&client_id=" + clientId +
                         "&redirect_uri=" + frontendUrl + "/oauth/kakao" +
                         "&code=" + request.getCode())
                 .retrieve()
@@ -284,6 +289,22 @@ public class EmployeeService {
                         .header(HttpHeaders.AUTHORIZATION, "Bearer " + response.getAccessToken())
                         .retrieve()
                         .body(Map.class);
+
+        // 3. Oauth 데이터 셋팅
+        Long providerId = (Long) infoResponse.get("id");
+        Map<String, Object> properties = (Map<String, Object>) infoResponse.get("properties");
+        String nickname = (String) properties.get("nickname");
+
+        log.debug("nickname : {} ",  nickname);
+
+        // 4. 기존에 존재하는 사원인지 확인.
+        Employee employee = employeeRepository.findByName(nickname).orElse(null);
+        if (employee == null) {
+            // 4.1) 미존재시
+        }
+
+        // 5.
+
 
         return null;
     }
