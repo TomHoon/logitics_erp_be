@@ -11,10 +11,13 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -22,6 +25,20 @@ import java.util.List;
 public class EmployeeController {
 
 	private final EmployeeService employeeService;
+
+    @PostMapping("/logout")
+	public Map<String, String> logout(HttpServletResponse response) {
+        ResponseCookie cookie = ResponseCookie.from("accessToken", "")
+                .httpOnly(true)
+                .path("/")
+                .maxAge(0)
+                .build();
+
+        response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
+
+        return Map.of("결과", "로그아웃성공");
+    }
+
 
 	@PostMapping("/login")
 	public LoginResponse login(@RequestBody LoginRequest loginRequest, HttpServletResponse response
@@ -91,5 +108,11 @@ public class EmployeeController {
 	) {
 		return employeeService.createEmployee(request);
 	}
+
+    @PostMapping("/oauth/kakao")
+    public LoginResponse oauthLogin(@RequestBody OauthRequest request) {
+        return employeeService.oauthLogin(request);
+
+    }
 
 }

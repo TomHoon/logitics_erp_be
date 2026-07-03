@@ -12,11 +12,15 @@ import com.logitics.erp.position.repository.PositionRepository;
 import io.micrometer.common.util.StringUtils;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestClient;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -30,7 +34,10 @@ public class EmployeeService {
 	private final JwtProvider jwtProvider;
 	private final PasswordEncoder passwordEncoder;
 
-	public void createEmployeeTest() {
+    private final RestClient restClient = RestClient.create();
+
+
+    public void createEmployeeTest() {
 		Department d = departmentRepository.findById(1L).orElseThrow();
 
 		Employee e = Employee.builder()
@@ -79,7 +86,11 @@ public class EmployeeService {
 	}
 
 	public LoginResponse login(LoginRequest loginRequest) throws Exception {
-		Employee loginEmployee = employeeRepository.findByEmail(loginRequest.getEmail()).orElseThrow();
+		Employee loginEmployee = employeeRepository.findByEmail(loginRequest.getEmail()).orElse(null);
+        if (loginEmployee == null) {
+            throw new IllegalArgumentException("아이디 혹은 비밀번호를 확인해주세요.");
+        }
+
 		String encryptedPassword = loginEmployee.getPassword();
 		Boolean isSamePassword = passwordEncoder.matches(loginRequest.getPassword(), encryptedPassword);
 
@@ -125,7 +136,17 @@ public class EmployeeService {
             throw new IllegalArgumentException("이메일이 중복됩니다. 다른 이메일을 사용해주세요.");
         }
 
-        // 4. 나머지 처리
+        // 4. 은행계좌, 은행명 비어있는지 확인
+        if (
+                registerEmployeeRequest.getAccountNumber() == null
+                        || registerEmployeeRequest.getAccountNumber() == ""
+                        || registerEmployeeRequest.getBankName() == null
+                        || registerEmployeeRequest.getBankName() == ""
+        ) {
+            throw new IllegalArgumentException("은행 정보가 올바르지 않습니다.");
+        }
+
+        // 5. 나머지 처리
         Long lastEmployeeNo = employeeRepository.findAll().getLast().getEmployeeId();
         Employee newEmployee = Employee
                 .builder()
@@ -140,6 +161,9 @@ public class EmployeeService {
                 .employeeStatusCode(registerEmployeeRequest.getEmploymentStatus())
                 .department(department)
                 .position(position)
+                .accountHolder(registerEmployeeRequest.getName())
+                .accountNumber(registerEmployeeRequest.getAccountNumber())
+                .bankName(registerEmployeeRequest.getBankName())
                 .build();
 
         Employee registeredEmployee = employeeRepository.save(newEmployee);
@@ -162,11 +186,16 @@ public class EmployeeService {
 
         String originPositionName = e.getPosition().getPositionName();
         if (!originPositionName.equals(receivedPositionName)) {
-            throw new IllegalArgumentException("등록된 부서와 일치하지 않습니다.");
+            throw new IllegalArgumentException("등록된 직급이 일치하지 않습니다.");
         }
 
         String pw = joinErpRequest.getPassword();
         String chkPw = joinErpRequest.getCheckPassword();
+
+        if (StringUtils.isBlank(pw) || StringUtils.isBlank(chkPw)) {
+            throw new IllegalArgumentException("비밀번호란을 입력해주세요.");
+        }
+
         if (!pw.equals(chkPw)) {
             throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
         }
@@ -174,8 +203,6 @@ public class EmployeeService {
         if (StringUtils.isNotBlank(e.getPassword())) {
             throw new IllegalArgumentException("이미 회원가입된 유저입니다. 고객센터에 문의하세요.");
         }
-
-        e.setEmail(joinErpRequest.getEmail());
 
         String encryptedPassword = passwordEncoder.encode(joinErpRequest.getPassword());
 
@@ -232,5 +259,28 @@ public class EmployeeService {
         Employee changedEmployeeEntity = employeeRepository.save(modifyEmployee);
 
         return changedEmployeeEntity.getEmployeeId() > 0;
+    }
+
+    public LoginResponse oauthLogin(OauthRequest request) {
+        // 1. accessToken 발급
+        OauthResponse response = restClient.post()
+                .uri("https://kauth.kakao.com/oauth/token")
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .body("grant_type=authorization_code" +
+                        "&client_id=" + "1b4c104820c24e95dbbf14b7f532b909" +
+                        "&redirect_uri=" + "http://localhost:3000/oauth/kakao" +
+                        "&code=" + request.getCode())
+                .retrieve()
+                .body(OauthResponse.class);
+
+        // 2. 사용자정보조회 /v2/user/me
+        Map<String, Object> infoResponse =
+                restClient.get()
+                        .uri("https://kapi.kakao.com/v2/user/me")
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + response.getAccessToken())
+                        .retrieve()
+                        .body(Map.class);
+
+        return null;
     }
 }
