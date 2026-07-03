@@ -34,7 +34,7 @@ public class AttendanceController {
 
 	@PostMapping("/checkin")
 	@Operation(summary = "출근등록")
-	public AttendResponse checkin(@RequestBody AttendRequest attendRequest, Authentication authentication) {
+	public AttendResponse checkin(@RequestBody(required = false) AttendRequest attendRequest, Authentication authentication) {
 		String email = authentication.getName();
 		String employeeNo = employeeRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("찾는 유저 정보가 없습니다.")).getEmployeeNo();
 		attendRequest.setEmployeeNo(employeeNo);

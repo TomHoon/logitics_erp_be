@@ -12,6 +12,7 @@ import com.logitics.erp.position.repository.PositionRepository;
 import io.micrometer.common.util.StringUtils;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -35,6 +36,9 @@ public class EmployeeService {
 	private final PasswordEncoder passwordEncoder;
 
     private final RestClient restClient = RestClient.create();
+
+    @Value("${server.frontend-url}")
+    private String frontendUrl;
 
 
     public void createEmployeeTest() {
@@ -268,7 +272,7 @@ public class EmployeeService {
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .body("grant_type=authorization_code" +
                         "&client_id=" + "1b4c104820c24e95dbbf14b7f532b909" +
-                        "&redirect_uri=" + "http://localhost:3000/oauth/kakao" +
+                        "&redirect_uri=" + frontendUrl + "/oauth/kakao" +
                         "&code=" + request.getCode())
                 .retrieve()
                 .body(OauthResponse.class);
