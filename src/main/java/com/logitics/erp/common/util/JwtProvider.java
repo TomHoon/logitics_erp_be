@@ -1,5 +1,6 @@
 package com.logitics.erp.common.util;
 
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
@@ -12,6 +13,7 @@ public class JwtProvider {
 
 	private final String SECRET_KEY = "secret-my-secretkey-hello-secret-my-secretkey-hello";
 	private final long ACCESS_TOKEN_TIME = 1000 * 60 * 30;
+	private final long PROVIDER_TOKEN_TIME = 1000 * 60 * 5;
 
 	public String createToken(String name) {
 		Date now = new Date();
@@ -20,6 +22,23 @@ public class JwtProvider {
 						.setSubject(name)
 						.setIssuedAt(now)
 						.setExpiration(new Date(now.getTime() + ACCESS_TOKEN_TIME))
+						.signWith(
+										Keys.hmacShaKeyFor(SECRET_KEY.getBytes()),
+										SignatureAlgorithm.HS256
+						)
+						.compact();
+
+		return token;
+	}
+
+	public String createProviderToken(String providerId, String nickname) {
+		Date now = new Date();
+
+		String token = Jwts.builder()
+						.claim("providerId", providerId)
+						.claim("nickname", nickname)
+						.setIssuedAt(now)
+						.setExpiration(new Date(now.getTime() + PROVIDER_TOKEN_TIME))
 						.signWith(
 										Keys.hmacShaKeyFor(SECRET_KEY.getBytes()),
 										SignatureAlgorithm.HS256
@@ -53,6 +72,14 @@ public class JwtProvider {
 		} catch (Exception e) {
 			return false;
 		}
+	}
+
+	public Claims getClaims(String token) {
+		return Jwts.parserBuilder()
+						.setSigningKey(Keys.hmacShaKeyFor(SECRET_KEY.getBytes()))
+						.build()
+						.parseClaimsJws(token)
+						.getBody();
 	}
 
 }

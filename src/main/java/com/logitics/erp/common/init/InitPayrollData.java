@@ -41,6 +41,9 @@ public class InitPayrollData implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
+				Employee e = employeeRepository.findByEmployeeNo("T9950").orElseThrow(() -> new IllegalArgumentException("사원없음"));
+				if (e != null) return;
+
         createTeamLeaderData();
     }
 

@@ -12,9 +12,11 @@ import com.logitics.erp.payrolldetail.entity.PayrollDetail;
 import com.logitics.erp.payrolldetail.repository.PayrollDetailRepository;
 import com.logitics.erp.payrollitem.entity.PayrollItemMaster;
 import com.logitics.erp.payrollitem.repository.PayrollItemMasterRepository;
+import jakarta.persistence.Column;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
@@ -34,7 +36,7 @@ public class PayrollService {
     public List<PayrollResponse> getList(PayrollRequest request) {
         int todayYear = LocalDate.now().getYear();
         int todayMonth = LocalDate.now().getMonthValue();
-        int yearMonth = Integer.parseInt(String.format("%02d", todayYear, todayMonth));
+        int yearMonth = Integer.parseInt(String.format("%d%02d", todayYear, todayMonth));
 
         return payrollMapper.getList(request, yearMonth);
     }
@@ -135,6 +137,9 @@ public class PayrollService {
                     .employeeNameSnapshot(emp.getName())
                     .departmentNameSnapshot(emp.getDepartment().getDepartmentName())
                     .positionNameSnapshot(emp.getPosition().getPositionName())
+				            .totalPayAmount(BigDecimal.ZERO)
+				            .totalDeductionAmount(BigDecimal.ZERO)
+				            .realPayAmount(BigDecimal.ZERO)
                     .build();
 
             Payroll savedPayroll = payrollRepository.save(newPayroll);

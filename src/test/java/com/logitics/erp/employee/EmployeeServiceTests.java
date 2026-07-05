@@ -2,8 +2,6 @@ package com.logitics.erp.employee;
 
 import com.logitics.erp.department.entity.Department;
 import com.logitics.erp.department.repository.DepartmentRepository;
-import com.logitics.erp.employee.dto.JoinRequest;
-import com.logitics.erp.employee.dto.LoginRequest;
 import com.logitics.erp.employee.entity.Employee;
 import com.logitics.erp.employee.mapper.EmployeeMapper;
 import com.logitics.erp.employee.repository.EmployeeRepository;
@@ -19,21 +17,22 @@ import com.logitics.erp.employeelanguage.entity.EmployeeLanguage;
 import com.logitics.erp.employeelanguage.repository.EmployeeLanguageRepository;
 import com.logitics.erp.employeemilitary.entity.EmployeeMilitary;
 import com.logitics.erp.employeemilitary.repository.EmployeeMilitaryRepository;
+import com.logitics.erp.employeeoauth.entity.EmployeeOauth;
+import com.logitics.erp.employeeoauth.repository.EmployeeOauthRepository;
 import com.logitics.erp.position.entity.Position;
 import com.logitics.erp.position.repository.PositionRepository;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
+import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.annotation.Commit;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 @SpringBootTest
 public class EmployeeServiceTests {
@@ -43,6 +42,9 @@ public class EmployeeServiceTests {
 
 	@Autowired
 	private EmployeeRepository employeeRepository;
+
+	@Autowired
+	private EmployeeOauthRepository employeeOauthRepository;
 
 	@Autowired
 	private PositionRepository positionRepository;
@@ -70,6 +72,41 @@ public class EmployeeServiceTests {
 
 	@Autowired
 	private PasswordEncoder passwordEncoder;
+
+	@Test
+	@DisplayName("소셜로그인 데이터 초기화")
+	@Commit
+	@Transactional
+	public void resetSocialEmployeeInformation() {
+		// ----------------- 본인에게 맞는 데이터로 수정필요 -----------------
+
+		// 1. 변경할 회원정보 이름 (본인에게 맞는 데이터로 변경필요!)
+		String 수정할사원명 = "동훈";
+
+		// 2. 변경할 이메일 (본인에게 맞는 데이터로 변경필요!)
+		String 수정할이메일 = "donghoon@naver.com";
+
+		// 3. 변경할 비밀번호 (본인에게 맞는 데이터로 변경필요!)
+		String 수정할비밀번호 = "1234";
+
+		// -----------------이후 아래 로직은 수정할 필요 없음-----------------
+
+		// 4. 이메일, 비밀번호 셋팅
+		Employee e = employeeRepository.findByName(수정할사원명).orElse(null);
+		if (e == null) {
+			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "해당 회원 존재하지 않습니다.");
+		}
+
+		// 5. social로그인 저장데이터 삭제하기
+		String providerId = e.getEmail();
+		EmployeeOauth ea = employeeOauthRepository.findByProviderId(providerId).orElse(null);
+		employeeOauthRepository.deleteAllByProviderId(providerId);
+
+		e.setEmail(수정할이메일);
+		e.setPassword(passwordEncoder.encode(수정할비밀번호));
+		employeeRepository.save(e);
+
+	}
 
 	@Test
 	@DisplayName("2. 회원가입 데이터 생성")
@@ -138,20 +175,20 @@ public class EmployeeServiceTests {
 	@DisplayName("1. 우리의 데이터 저장")
 	@Commit
 	public void createOurData() {
-		record TestUser(String name, String email) {}
+		record TestEmployee(String name, String email) {}
 
 
 		Department department =
 						departmentRepository.findById(31L)
 										.orElseThrow();
 
-		List<TestUser> list = List.of(
-						new TestUser("리흔", "riheun@naver.com"),
-						new TestUser("주안", "juan@naver.com"),
-						new TestUser("예린", "yerin@naver.com"),
-						new TestUser("정민", "jungmin@naver.com"),
-						new TestUser("민성", "minsung@naver.com"),
-						new TestUser("하진", "hajin@naver.com")
+		List<TestEmployee> list = List.of(
+						new TestEmployee("리흔", "riheun@naver.com"),
+						new TestEmployee("주안", "juan@naver.com"),
+						new TestEmployee("예린", "yerin@naver.com"),
+						new TestEmployee("정민", "jungmin@naver.com"),
+						new TestEmployee("민성", "minsung@naver.com"),
+						new TestEmployee("하진", "hajin@naver.com")
 		);
 
 		for (int i = 0; i < list.size(); i++) {

@@ -71,7 +71,8 @@ public class AttendanceService {
 		LocalDateTime now = LocalDateTime.now();
 		String statusCode = "출근";
 
-		if (now.toLocalTime().isAfter(LocalTime.of(8, 15))) {
+		LocalTime startTime = attendanceProperty.getStartTime();
+		if (now.toLocalTime().isAfter(startTime)) {
 			statusCode = "지각";
 		}
 
@@ -137,12 +138,12 @@ public class AttendanceService {
 
 		// 퇴근시간 검사1) 퇴근시간 되기 전인 경우
 		if ((nowHour < endHour)) {
-			throw new IllegalArgumentException("[ERR-CHECKOUT-001] 퇴근시간 5분 전 부터 퇴근처리가 가능합니다.");
+			throw new IllegalArgumentException("[ERR-CHECKOUT-001] 퇴근시간 20분 전 부터 퇴근처리가 가능합니다.");
 		}
 
 		// 퇴근시간 검사2) 퇴근 시간이지만 5분 보다 전인 경우
-		if ((nowHour == endHour && (nowMinute < endMinute -5 ))) {
-			throw new IllegalArgumentException("[ERR-CHECKOUT-002] 퇴근시간 5분 전 부터 퇴근처리가 가능합니다.");
+		if ((nowHour == endHour && (nowMinute < endMinute -20 ))) {
+			throw new IllegalArgumentException("[ERR-CHECKOUT-002] 퇴근시간 20분 전 부터 퇴근처리가 가능합니다.");
 		}
 
 		employeeAttendance.setAttendanceStatusCode("퇴근");

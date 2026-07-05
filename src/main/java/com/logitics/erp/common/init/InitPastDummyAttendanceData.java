@@ -36,7 +36,11 @@ public class InitPastDummyAttendanceData implements CommandLineRunner {
 
     void createMayData() {
         // 4-1. 이미 등록되어 있으면 패스
-        Employee emp = employeeRepository.findByEmail("hajin@naver.com").orElseThrow();
+        Employee emp = employeeRepository.findByEmail("hajin@naver.com").orElse(null);
+
+				// 소셜로그인시 email 다를 수 있음.
+				if (emp == null) return;
+
         LocalDate startMonth = LocalDate.of(2026, 05, 01).withDayOfMonth(1);
         LocalDate endMonth = startMonth.plusMonths(1);
         List<Attendance> alreadyExistedList = attendanceMapper.getAttendanceByMonth(startMonth, endMonth, emp.getEmployeeId());
@@ -73,7 +77,8 @@ public class InitPastDummyAttendanceData implements CommandLineRunner {
 
     void createJuneData() {
         // 4-1. 이미 등록되어 있으면 패스
-        Employee emp = employeeRepository.findByEmail("hajin@naver.com").orElseThrow();
+        Employee emp = employeeRepository.findByEmail("hajin@naver.com").orElse(null);
+				if (emp == null) return;
         LocalDate startMonth = LocalDate.of(2026, 06, 01).withDayOfMonth(1);
         LocalDate endMonth = startMonth.plusMonths(1);
         List<Attendance> alreadyExistedList = attendanceMapper.getAttendanceByMonth(startMonth, endMonth, emp.getEmployeeId());

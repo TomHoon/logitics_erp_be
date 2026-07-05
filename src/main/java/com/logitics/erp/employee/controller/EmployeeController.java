@@ -109,10 +109,17 @@ public class EmployeeController {
 		return employeeService.createEmployee(request);
 	}
 
+		@Operation(description = "카카오 소셜 로그인")
     @PostMapping("/oauth/kakao")
     public LoginResponse oauthLogin(@RequestBody OauthRequest request) {
         return employeeService.oauthLogin(request);
-
     }
+
+		@Operation(description = "카카오 소셜 로그인")
+		@PostMapping("/oauth/add-info")
+		public LoginResponse oauthAddInfo(@RequestBody JoinErpRequest request, HttpServletResponse servletResponse) {
+			return employeeService.oauthAddInfo(request, servletResponse);
+		}
+
 
 }

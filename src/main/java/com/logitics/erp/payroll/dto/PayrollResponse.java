@@ -39,6 +39,9 @@ public class PayrollResponse {
     @Schema(description = "직책수당", example = "300000")
     private String responsibilityAllowanceAmount;
 
+    @Schema(description = "직급수당", example = "300000")
+    private String positionAllowanceAmount;
+
     @Schema(description = "수당 합계", example = "600000")
     private String totalAllowanceAmount;
 

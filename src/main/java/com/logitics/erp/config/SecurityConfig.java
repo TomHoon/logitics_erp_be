@@ -37,6 +37,7 @@ public class SecurityConfig {
 										auth -> auth.requestMatchers(
 														"/api/v1/employees/login",
 														"/api/v1/employees/oauth/kakao",
+														"/api/v1/employees/oauth/add-info",
 														"/api/v1/employees/logout",
                                                         "/api/v1/employees/joinErp",
 														"/swagger-ui/**",

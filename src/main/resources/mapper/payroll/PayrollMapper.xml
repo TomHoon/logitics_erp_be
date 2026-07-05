@@ -16,7 +16,7 @@
             max(case when pd.item_name_snapshot = '기본급' then pd.amount else 0 end) as basic_salary_amount,
             max(case when pd.item_name_snapshot = '식대' then pd.amount else 0 end) as meal_allowance_amount,
             max(case when pd.item_name_snapshot = '교통비' then pd.amount else 0 end) as transportation_allowance_amount,
-            max(case when pd.item_name_snapshot = '직책수당' then pd.amount else 0 end) as responsibility_allowance_amount
+            max(case when pd.item_name_snapshot = '직급수당' then pd.amount else 0 end) as position_allowance_amount
         from payroll pr
             left join payroll_detail pd
                 on pd.payroll_id = pr.payroll_id
@@ -26,6 +26,9 @@
                 on d.department_id = e.department_id
             left join positions p
                 on e.position_id  = p.position_id
+        where pr.payroll_year_month = #{yearMonth}
+        group by
+            employee_no
     </select>
     <select id="updateBasicSalary">
         select *
@@ -51,6 +54,8 @@
                 on e.position_id = pos.position_id
         where p.payroll_year_month = #{payrollYearMonth}
             and pd.item_name_snapshot = '기본급'
+        ORDER BY pd.amount DESC
+        LIMIT 1;
 
     </select>
 

@@ -7,18 +7,25 @@ import com.logitics.erp.employee.dto.*;
 import com.logitics.erp.employee.entity.Employee;
 import com.logitics.erp.employee.mapper.EmployeeMapper;
 import com.logitics.erp.employee.repository.EmployeeRepository;
+import com.logitics.erp.employeeoauth.entity.EmployeeOauth;
+import com.logitics.erp.employeeoauth.repository.EmployeeOauthRepository;
 import com.logitics.erp.position.entity.Position;
 import com.logitics.erp.position.repository.PositionRepository;
+import io.jsonwebtoken.Claims;
 import io.micrometer.common.util.StringUtils;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -36,6 +43,7 @@ public class EmployeeService {
 	private final EmployeeMapper employeeMapper;
 	private final JwtProvider jwtProvider;
 	private final PasswordEncoder passwordEncoder;
+	private final EmployeeOauthRepository employeeOauthRepository;
 
     private final RestClient restClient = RestClient.create();
 
@@ -94,7 +102,7 @@ public class EmployeeService {
 		return employeeMapper.getTest();
 	}
 
-	public LoginResponse login(LoginRequest loginRequest) throws Exception {
+	public LoginResponse login(LoginRequest loginRequest) {
 		Employee loginEmployee = employeeRepository.findByEmail(loginRequest.getEmail()).orElse(null);
         if (loginEmployee == null) {
             throw new IllegalArgumentException("아이디 혹은 비밀번호를 확인해주세요.");
@@ -123,7 +131,7 @@ public class EmployeeService {
 							.build();
 		}
 
-		throw new Exception("올바른 회원 정보가 아닙니다.");
+		throw new IllegalArgumentException("올바른 회원 정보가 아닙니다.");
 	}
 
     public Boolean registerEmployee(RegisterEmployeeRequest registerEmployeeRequest) {
@@ -297,15 +305,134 @@ public class EmployeeService {
 
         log.debug("nickname : {} ",  nickname);
 
-        // 4. 기존에 존재하는 사원인지 확인.
-        Employee employee = employeeRepository.findByName(nickname).orElse(null);
-        if (employee == null) {
-            // 4.1) 미존재시
-        }
+        // 4. 기존 가입자인지 확인 (nickname, providerId 만 제공받음)
+	      Employee e = employeeRepository.findByEmail(String.valueOf(providerId)).orElse(null);
 
-        // 5.
+				if (e == null) {
+					// 4.1 미가입자. 추가 정보 화면으로 이동하여 추가로직 실시
+	        String providerToken = jwtProvider.createProviderToken(String.valueOf(providerId), nickname);
+					return LoginResponse
+									.builder()
+									.providerToken(providerToken)
+									.build();
+				}
 
+				// 4.2 가입자인 경우 로그인 정보 내려주기
+		    String accessToken = jwtProvider.createToken(String.valueOf(providerId));
+		    long expireIn = 1000 * 60 * 30;
+		    String name = e.getName();
+		    String email = e.getEmail();
+		    String employeeNo = e.getEmployeeNo();
+		    String departmentName = e.getDepartment().getDepartmentName();
+		    String positionName = e.getPosition().getPositionName();
 
-        return null;
+		    return LoginResponse.builder()
+						    .accessToken(accessToken)
+						    .name(name)
+						    .expireIn(expireIn)
+						    .email(email)
+						    .employeeNo(employeeNo)
+						    .position(positionName)
+						    .departmentName(departmentName)
+						    .build();
+
+//        Employee employee = employeeRepository.findByName(nickname).orElse(null);
+//        if (employee == null) {
+//          // 4.1) 미존재시 토큰 발급하여 추가정보 화면까지 대기
+//	        String providerToken = jwtProvider.createProviderToken(String.valueOf(providerId), nickname);
+//					return LoginResponse
+//									.builder()
+//									.providerToken(providerToken)
+//									.build();
+//        }
+
+        // 5. providerId가 존재하는 경우
+//	    EmployeeOauth employeeOauth = employeeOauthRepository.findByProviderId(providerId).orElse(null);
+//			if (employeeOauth == null) {
+//				// 5.1) 특이 케이스, providerId 없는 경우
+//				throw new IllegalArgumentException("해당하는 로그인 정보가 없습니다.");
+//			}
+//
+//			// 6. 로그인처리하기
+//	    Employee e = employeeOauth.getEmployee();
+//			LoginRequest loginRequest = LoginRequest
+//							.builder()
+//							.email(e.getEmail())
+//							.password(e.getPassword())
+//							.build();
+//
+//			return login(loginRequest);
     }
+
+	@Transactional
+	public LoginResponse oauthAddInfo(JoinErpRequest request, HttpServletResponse servletResponse) {
+		// [소셜로그인 최종 가입 프로세스]
+
+		// 1. 사원번호로 해당하는 사원 존재여부 확인
+		Employee e = employeeRepository.findByEmployeeNo(request.getEmployeeNo()).orElse(null);
+		if (e == null) {
+			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "존재하지 않는 사원입니다.");
+		}
+
+		// 2. 비밀번호 확인
+		String password = request.getPassword();
+		String checkPassword = request.getCheckPassword();
+		if (!password.equals(checkPassword)) {
+			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "비밀번호가 일치하지 않습니다.");
+		}
+
+		// 3. providerToken에서 providerId, nickname 추출
+		Claims claims = jwtProvider.getClaims(request.getProviderToken());
+		String providerId = claims.get("providerId", String.class);
+		String nickname = claims.get("nickname", String.class);
+
+		e.setPassword(passwordEncoder.encode(password));
+		e.setEmail(String.valueOf(providerId));
+
+		EmployeeOauth employeeOauth = EmployeeOauth
+						.builder()
+						.employee(e)
+						.providerNickname(nickname)
+						.provider("kakao")
+						.providerId(providerId)
+						.build();
+
+		// 4. 비밀번호 저장 및 소셜로그인 데이터 추가
+		employeeRepository.save(e);
+		employeeOauthRepository.save(employeeOauth);
+
+
+		// 5. 로그인 완료와 같이 로그인 정보 내려주기
+		String accessToken = jwtProvider.createToken(String.valueOf(providerId));
+		long expireIn = 1000 * 60 * 30;
+		String name = e.getName();
+		String email = e.getEmail();
+		String employeeNo = e.getEmployeeNo();
+		String departmentName = e.getDepartment().getDepartmentName();
+		String positionName = e.getPosition().getPositionName();
+
+
+
+		// 6. 쿠키에 httpOnly 데이터 추가
+		Cookie cookie = new Cookie(
+						"accessToken",
+						accessToken
+		);
+
+		cookie.setHttpOnly(true);
+		cookie.setPath("/");
+		cookie.setMaxAge(60 * 60);
+
+		servletResponse.addCookie(cookie);
+
+		return LoginResponse.builder()
+						.accessToken(accessToken)
+						.name(name)
+						.expireIn(expireIn)
+						.email(email)
+						.employeeNo(employeeNo)
+						.position(positionName)
+						.departmentName(departmentName)
+						.build();
+	}
 }

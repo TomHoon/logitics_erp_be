@@ -13,6 +13,15 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Getter
 @Builder
+@Table(
+				name = "employee_oauth",
+				uniqueConstraints = {
+								@UniqueConstraint(
+												name = "uk_employee_oauth_provider_provider_id",
+												columnNames = {"provider", "provider_id"}
+								)
+				}
+)
 public class EmployeeOauth extends BaseEntity {
     
     @Id

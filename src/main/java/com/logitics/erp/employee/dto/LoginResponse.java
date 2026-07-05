@@ -14,5 +14,7 @@ public class LoginResponse {
 	private String position;
 	private String employeeNo;
 	private String departmentName;
+	private String providerToken;
+
 
 }
