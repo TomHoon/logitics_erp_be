@@ -27,6 +27,15 @@
             left join positions p
                 on e.position_id  = p.position_id
         where pr.payroll_year_month = #{yearMonth}
+            <if test="request.keyword != null and request.keyword != ''">
+                and e.name like concat('%', #{request.keyword}, '%')
+            </if>
+            <if test="request.departmentName != null and request.departmentName != '' and request.departmentName != '전체'">
+                and d.department_name = #{request.departmentName}
+            </if>
+            <if test="request.positionName != null and request.positionName != '' and request.positionName != '전체'">
+                and p.position_name = #{request.positionName}
+            </if>
         group by
             employee_no
     </select>
@@ -145,6 +154,36 @@
         select count(*) from payroll
         where employee_id = #{employeeId}
         and payroll_year_month = #{payrollYearMonth}
+    </select>
+
+    <select id="getPaymentList">
+        select
+            pr.payroll_id,
+            e.employee_no,
+            e.name as employee_name,
+            d.department_name,
+            pr.payment_date,
+            pr.payroll_status_code,
+            max(case when pd.item_name_snapshot = '기본급' then pd.amount else 0 end) as basic_salary_amount,
+            max(case when pd.item_name_snapshot = '식대' then pd.amount else 0 end) as meal_allowance_amount,
+            max(case when pd.item_name_snapshot = '교통비' then pd.amount else 0 end) as transportation_allowance_amount,
+            max(case when pd.item_name_snapshot = '야근수당' then pd.amount else 0 end) as overtime_allowance_amount
+        from payroll pr
+            left join payroll_detail pd
+                on pd.payroll_id = pr.payroll_id
+            left join employee e
+                on pr.employee_id = e.employee_id
+            left join department d
+                on d.department_id = e.department_id
+        where pr.payroll_year_month = #{yearMonth}
+            <if test="request.keyword != null and request.keyword != ''">
+                and e.name like concat('%', #{request.keyword}, '%')
+            </if>
+            <if test="request.departmentName != null and request.departmentName != '' and request.departmentName != '전체'">
+                and d.department_name = #{request.departmentName}
+            </if>
+        group by
+            pr.payroll_id, e.employee_no, e.name, d.department_name, pr.payment_date, pr.payroll_status_code
     </select>
 
 </mapper>

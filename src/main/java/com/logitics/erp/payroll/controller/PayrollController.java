@@ -49,4 +49,16 @@ public class PayrollController {
         return payrollService.registerSalary(request);
     }
 
+    @Operation(description = "급여지급 목록 조회")
+    @GetMapping("/payment")
+    public List<PaymentPayrollResponse> getPaymentList(PaymentPayrollRequest request) {
+        return payrollService.getPaymentList(request);
+    }
+
+    @Operation(description = "급여확정 (선택한 급여명세 일괄 확정)")
+    @PatchMapping("/confirm")
+    public ConfirmPayrollResponse confirmPayroll(@RequestBody ConfirmPayrollRequest request) {
+        return payrollService.confirmPayroll(request);
+    }
+
 }

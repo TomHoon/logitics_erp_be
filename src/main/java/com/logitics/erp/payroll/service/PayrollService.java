@@ -14,10 +14,12 @@ import com.logitics.erp.payrollitem.entity.PayrollItemMaster;
 import com.logitics.erp.payrollitem.repository.PayrollItemMasterRepository;
 import jakarta.persistence.Column;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -33,10 +35,17 @@ public class PayrollService {
     private final DepartmentRepository departmentRepository;
     private final PayrollItemMasterRepository payrollItemMasterRepository;
 
+    @Value("${payroll.confirm-window-days}")
+    private int confirmWindowDays;
+
+    private static final double NATIONAL_PENSION_RATE = 0.045;
+    private static final double HEALTH_INSURANCE_RATE = 0.03545;
+    private static final double EMPLOYMENT_INSURANCE_RATE = 0.009;
+    private static final double INCOME_TAX_RATE = 0.003;
+
     public List<PayrollResponse> getList(PayrollRequest request) {
-        int todayYear = LocalDate.now().getYear();
-        int todayMonth = LocalDate.now().getMonthValue();
-        int yearMonth = Integer.parseInt(String.format("%d%02d", todayYear, todayMonth));
+        LocalDate baseDate = request.getApplyDate() != null ? request.getApplyDate() : LocalDate.now();
+        int yearMonth = Integer.parseInt(String.format("%d%02d", baseDate.getYear(), baseDate.getMonthValue()));
 
         return payrollMapper.getList(request, yearMonth);
     }
@@ -202,5 +211,93 @@ public class PayrollService {
         }
 
         return Map.of("결과", "실패");
+    }
+
+    public List<PaymentPayrollResponse> getPaymentList(PaymentPayrollRequest request) {
+        LocalDate baseDate = request.getApplyDate() != null ? request.getApplyDate() : LocalDate.now();
+        int yearMonth = Integer.parseInt(String.format("%d%02d", baseDate.getYear(), baseDate.getMonthValue()));
+
+        List<PaymentPayrollResponse> list = payrollMapper.getPaymentList(request, yearMonth);
+
+        for (PaymentPayrollResponse item : list) {
+            int totalPay = item.getBasicSalaryAmount()
+                    + item.getMealAllowanceAmount()
+                    + item.getTransportationAllowanceAmount()
+                    + item.getOvertimeAllowanceAmount();
+
+            int nationalPension = (int) Math.round(totalPay * NATIONAL_PENSION_RATE);
+            int healthInsurance = (int) Math.round(totalPay * HEALTH_INSURANCE_RATE);
+            int employmentInsurance = (int) Math.round(totalPay * EMPLOYMENT_INSURANCE_RATE);
+            int incomeTax = (int) Math.round(totalPay * INCOME_TAX_RATE);
+            int totalDeduction = nationalPension + healthInsurance + employmentInsurance + incomeTax;
+
+            item.setTotalPayAmount(totalPay);
+            item.setNationalPensionAmount(nationalPension);
+            item.setHealthInsuranceAmount(healthInsurance);
+            item.setEmploymentInsuranceAmount(employmentInsurance);
+            item.setIncomeTaxAmount(incomeTax);
+            item.setTotalDeductionAmount(totalDeduction);
+            item.setRealPayAmount(totalPay - totalDeduction);
+
+            item.setPayrollStatusText(item.getPayrollStatusCode() != null ? item.getPayrollStatusCode().getText() : null);
+
+            String notConfirmableReason = getNotConfirmableReason(item.getPayrollStatusCode(), item.getPaymentDate());
+            item.setConfirmable(notConfirmableReason == null);
+            item.setNotConfirmableReason(notConfirmableReason);
+        }
+
+        return list;
+    }
+
+    private String getNotConfirmableReason(PayrollStatusCode statusCode, LocalDate paymentDate) {
+        if (statusCode == PayrollStatusCode.CONFIRMED || statusCode == PayrollStatusCode.PAID) {
+            return "이미 확정된 급여입니다.";
+        }
+        if (statusCode == PayrollStatusCode.CANCELED) {
+            return "취소된 급여입니다.";
+        }
+        if (paymentDate == null) {
+            return "지급일이 설정되지 않았습니다.";
+        }
+
+        LocalDate windowStart = paymentDate.minusDays(confirmWindowDays);
+        LocalDate windowEnd = paymentDate.minusDays(1);
+        LocalDate today = LocalDate.now();
+
+        if (today.isBefore(windowStart) || today.isAfter(windowEnd)) {
+            return String.format(
+                    "확정 가능 기간이 아닙니다. (지급일 %d일 전인 %s부터 %s까지 확정 가능)",
+                    confirmWindowDays, windowStart, windowEnd
+            );
+        }
+
+        return null;
+    }
+
+    public ConfirmPayrollResponse confirmPayroll(ConfirmPayrollRequest request) {
+        List<Long> payrollIds = request.getPayrollIds();
+        List<Map<String, Object>> failed = new ArrayList<>();
+        int confirmedCount = 0;
+
+        for (Long payrollId : payrollIds) {
+            Payroll payroll = payrollRepository.findById(payrollId).orElse(null);
+
+            if (payroll == null) {
+                failed.add(Map.of("payrollId", payrollId, "reason", "존재하지 않는 급여명세입니다."));
+                continue;
+            }
+
+            String notConfirmableReason = getNotConfirmableReason(payroll.getPayrollStatusCode(), payroll.getPaymentDate());
+            if (notConfirmableReason != null) {
+                failed.add(Map.of("payrollId", payrollId, "reason", notConfirmableReason));
+                continue;
+            }
+
+            payroll.setPayrollStatusCode(PayrollStatusCode.CONFIRMED);
+            payrollRepository.save(payroll);
+            confirmedCount++;
+        }
+
+        return new ConfirmPayrollResponse(confirmedCount, failed);
     }
 }
