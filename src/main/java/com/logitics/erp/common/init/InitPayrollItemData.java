@@ -4,12 +4,14 @@ import com.logitics.erp.payrollitem.entity.PayrollItemMaster;
 import com.logitics.erp.payrollitem.repository.PayrollItemMasterRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 
 @Component
 @RequiredArgsConstructor
+@Order(value = 4)
 public class InitPayrollItemData implements CommandLineRunner {
 
     private final PayrollItemMasterRepository payrollItemMasterRepository;
