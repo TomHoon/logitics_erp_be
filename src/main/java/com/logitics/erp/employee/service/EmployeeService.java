@@ -272,6 +272,9 @@ public class EmployeeService {
         modifyEmployee.setEmployeeStatusCode(modifyEmployeeRequest.getEmploymentStatus());
         modifyEmployee.setPosition(changePosition);
         modifyEmployee.setDepartment(changeDepartment);
+        modifyEmployee.setBankName(modifyEmployeeRequest.getBankName());
+        modifyEmployee.setAccountNumber(modifyEmployeeRequest.getAccountNumber());
+        modifyEmployee.setAccountHolder(modifyEmployeeRequest.getName());
 
         Employee changedEmployeeEntity = employeeRepository.save(modifyEmployee);
 

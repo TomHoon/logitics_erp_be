@@ -39,7 +39,10 @@ public class EmployeeListPayrollResponse {
     @Schema(description = "직급수당(원)", example = "300000")
     private Long responsibilityAllowance;
 
-    @Schema(description = "급여 지급일", example = "25일")
-    private String paymentDate;
+    @Schema(description = "직책수당(원)", example = "200000")
+    private Long dutyAllowance;
+
+    @Schema(description = "기존에 등록된 급여 지급일 (처음 등록하는 사원이면 null)", example = "2026-06-25")
+    private LocalDate paymentDate;
 
 }

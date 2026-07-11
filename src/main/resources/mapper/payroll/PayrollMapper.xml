@@ -16,7 +16,9 @@
             max(case when pd.item_name_snapshot = '기본급' then pd.amount else 0 end) as basic_salary_amount,
             max(case when pd.item_name_snapshot = '식대' then pd.amount else 0 end) as meal_allowance_amount,
             max(case when pd.item_name_snapshot = '교통비' then pd.amount else 0 end) as transportation_allowance_amount,
-            max(case when pd.item_name_snapshot = '직급수당' then pd.amount else 0 end) as position_allowance_amount
+            max(case when pd.item_name_snapshot = '직급수당' then pd.amount else 0 end) as position_allowance_amount,
+            max(case when pd.item_name_snapshot = '직책수당' then pd.amount else 0 end) as responsibility_allowance_amount,
+            sum(case when pd.item_name_snapshot != '기본급' then pd.amount else 0 end) as total_allowance_amount
         from payroll pr
             left join payroll_detail pd
                 on pd.payroll_id = pr.payroll_id
@@ -103,8 +105,9 @@
             max(case when pd.item_name_snapshot = '기본급' then pd.amount else 0 end) as basic_salary,
             max(case when pd.item_name_snapshot = '식대' then pd.amount else 0 end) as meal_allowance,
             max(case when pd.item_name_snapshot = '교통비' then pd.amount else 0 end) as transportation_allowance,
-            max(case when pd.item_name_snapshot = '직책수당' then pd.amount else 0 end) as responsibility_allowance,
-            p.payment_date
+            max(case when pd.item_name_snapshot = '직급수당' then pd.amount else 0 end) as responsibility_allowance,
+            max(case when pd.item_name_snapshot = '직책수당' then pd.amount else 0 end) as duty_allowance,
+            max(p.payment_date) as payment_date
         from employee e
             left join payroll p
                 on e.employee_id = p.employee_id
@@ -141,7 +144,8 @@
             when '기본급' then #{basicSalary}
             when '식대' then #{mealAllowance}
             when '교통비' then #{transportationAllowance}
-            when '직책수당' then #{responsibilityAllowance}
+            when '직급수당' then #{responsibilityAllowance}
+            when '직책수당' then #{dutyAllowance}
                 else
                     pd.amount
             END
@@ -184,6 +188,46 @@
             </if>
         group by
             pr.payroll_id, e.employee_no, e.name, d.department_name, pr.payment_date, pr.payroll_status_code
+    </select>
+
+    <select id="getTrendRaw">
+        select
+            pr.payroll_id,
+            pr.payroll_year_month,
+            pr.payment_date,
+            pr.payroll_status_code,
+            max(case when pd.item_name_snapshot = '기본급' then pd.amount else 0 end) as basic_salary_amount,
+            sum(case when pd.item_name_snapshot != '기본급' then pd.amount else 0 end) as total_allowance_amount
+        from payroll pr
+            left join payroll_detail pd
+                on pd.payroll_id = pr.payroll_id
+        where pr.employee_id = #{employeeId}
+            and pr.payroll_year_month >= #{yearStart}
+            and pr.payroll_year_month &lt;= #{yearEnd}
+        group by
+            pr.payroll_id, pr.payroll_year_month, pr.payment_date, pr.payroll_status_code
+    </select>
+
+    <select id="getHistory">
+        select
+            pr.payroll_id,
+            pr.payroll_year_month,
+            pr.payment_date,
+            pr.payroll_status_code,
+            max(case when pd.item_name_snapshot = '기본급' then pd.amount else 0 end) as basic_salary_amount,
+            max(case when pd.item_name_snapshot = '식대' then pd.amount else 0 end) as meal_allowance_amount,
+            max(case when pd.item_name_snapshot = '교통비' then pd.amount else 0 end) as transportation_allowance_amount,
+            max(case when pd.item_name_snapshot = '직급수당' then pd.amount else 0 end) as position_allowance_amount
+        from payroll pr
+            left join payroll_detail pd
+                on pd.payroll_id = pr.payroll_id
+            left join employee e
+                on pr.employee_id = e.employee_id
+        where e.employee_no = #{employeeNo}
+        group by
+            pr.payroll_id, pr.payroll_year_month, pr.payment_date, pr.payroll_status_code
+        order by
+            pr.payroll_year_month desc
     </select>
 
 </mapper>

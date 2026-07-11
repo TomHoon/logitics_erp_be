@@ -24,6 +24,9 @@ public class RegisterSalaryRequest {
     @Schema(description = "직급수당(원)", example = "300000")
     private int responsibilityAllowance;
 
+    @Schema(description = "직책수당(원)", example = "200000")
+    private int dutyAllowance;
+
     @Schema(description = "급여 지급일", example = "25일")
     private String paymentDate;
 
