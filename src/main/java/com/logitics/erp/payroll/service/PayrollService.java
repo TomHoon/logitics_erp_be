@@ -92,7 +92,7 @@ public class PayrollService {
 
         // 2. 부서명 조회
         Department department = departmentRepository.findByDepartmentName(request.getDepartmentName()).orElse(null);
-        if (request.getDepartmentName() != "" && request.getDepartmentName() != "전체" && request.getDepartmentName() != null && department == null) {
+        if (request.getDepartmentName() != "" && !request.getDepartmentName().equals("전체") && request.getDepartmentName() != null && department == null) {
             return Collections.emptyList();
         }
 
