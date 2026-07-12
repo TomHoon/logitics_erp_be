@@ -19,4 +19,7 @@ public class EmployeeListResponse {
     private String address;
     private String detailedAddress;
 
+    private String bankName;
+    private String accountNumber;
+
 }

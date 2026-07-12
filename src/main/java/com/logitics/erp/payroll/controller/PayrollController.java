@@ -4,6 +4,7 @@ import com.logitics.erp.payroll.dto.*;
 import com.logitics.erp.payroll.service.PayrollService;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -47,6 +48,36 @@ public class PayrollController {
     public Map<String, String> registerSalary(@RequestBody RegisterSalaryRequest request) {
 
         return payrollService.registerSalary(request);
+    }
+
+    @Operation(description = "급여지급 목록 조회")
+    @GetMapping("/payment")
+    public List<PaymentPayrollResponse> getPaymentList(PaymentPayrollRequest request) {
+        return payrollService.getPaymentList(request);
+    }
+
+    @Operation(description = "급여확정 (선택한 급여명세 일괄 확정)")
+    @PatchMapping("/confirm")
+    public ConfirmPayrollResponse confirmPayroll(@RequestBody ConfirmPayrollRequest request) {
+        return payrollService.confirmPayroll(request);
+    }
+
+    @Operation(description = "개인 급여조회 (연간 월별 추이, 로그인한 본인 기준)")
+    @GetMapping("/trend")
+    public PayrollTrendResponse getTrend(@RequestParam int year, Authentication authentication) {
+        return payrollService.getTrend(year, authentication);
+    }
+
+    @Operation(description = "특정 사원의 급여 변경 이력 조회")
+    @GetMapping("/history")
+    public List<PayrollHistoryItem> getHistory(@RequestParam String employeeNo) {
+        return payrollService.getHistory(employeeNo);
+    }
+
+    @Operation(description = "특정 사원의 기본급 변경 이력(수정 로그) 조회")
+    @GetMapping("/basic-salary-history")
+    public List<BasicSalaryHistoryResponse> getBasicSalaryHistory(@RequestParam String employeeNo) {
+        return payrollService.getBasicSalaryHistory(employeeNo);
     }
 
 }

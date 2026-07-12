@@ -12,13 +12,19 @@ import com.logitics.erp.payrolldetail.entity.PayrollDetail;
 import com.logitics.erp.payrolldetail.repository.PayrollDetailRepository;
 import com.logitics.erp.payrollitem.entity.PayrollItemMaster;
 import com.logitics.erp.payrollitem.repository.PayrollItemMasterRepository;
+import com.logitics.erp.payrollhistory.entity.PayrollBasicSalaryHistory;
+import com.logitics.erp.payrollhistory.repository.PayrollBasicSalaryHistoryRepository;
 import jakarta.persistence.Column;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -32,11 +38,19 @@ public class PayrollService {
     private final EmployeeRepository employeeRepository;
     private final DepartmentRepository departmentRepository;
     private final PayrollItemMasterRepository payrollItemMasterRepository;
+    private final PayrollBasicSalaryHistoryRepository payrollBasicSalaryHistoryRepository;
+
+    @Value("${payroll.confirm-window-days}")
+    private int confirmWindowDays;
+
+    private static final double NATIONAL_PENSION_RATE = 0.045;
+    private static final double HEALTH_INSURANCE_RATE = 0.03545;
+    private static final double EMPLOYMENT_INSURANCE_RATE = 0.009;
+    private static final double INCOME_TAX_RATE = 0.003;
 
     public List<PayrollResponse> getList(PayrollRequest request) {
-        int todayYear = LocalDate.now().getYear();
-        int todayMonth = LocalDate.now().getMonthValue();
-        int yearMonth = Integer.parseInt(String.format("%d%02d", todayYear, todayMonth));
+        LocalDate baseDate = request.getApplyDate() != null ? request.getApplyDate() : LocalDate.now();
+        int yearMonth = Integer.parseInt(String.format("%d%02d", baseDate.getYear(), baseDate.getMonthValue()));
 
         return payrollMapper.getList(request, yearMonth);
     }
@@ -47,8 +61,22 @@ public class PayrollService {
 
 
         PayrollDetail payrollDetail = payrollDetailRepository.findByPayroll_PayrollIdAndItemNameSnapshot(payrollId, "기본급").orElseThrow(() -> new IllegalArgumentException("해당 급여 항목이 존재하지 않습니다."));
-        payrollDetail.setAmount(request.getAmount());
+
+        int oldAmount = payrollDetail.getAmount();
+        int newAmount = request.getAmount();
+
+        payrollDetail.setAmount(newAmount);
         payrollDetailRepository.save(payrollDetail);
+
+        if (oldAmount != newAmount) {
+            PayrollBasicSalaryHistory history = PayrollBasicSalaryHistory.builder()
+                    .payroll(payroll)
+                    .employeeNo(payroll.getEmployee().getEmployeeNo())
+                    .oldAmount(oldAmount)
+                    .newAmount(newAmount)
+                    .build();
+            payrollBasicSalaryHistoryRepository.save(history);
+        }
 
         return new UpdateBasicSalaryResponse(Map.of("결과", "성공"));
 
@@ -189,7 +217,18 @@ public class PayrollService {
                     .amount(request.getTransportationAllowance())
                     .build();
 
-            payrollDetailRepository.saveAll(List.of(basicPd, responsibilityPd, mealPd, transportationPd));
+            // 3.2.5) 직책수당 추가
+            PayrollItemMaster dutyPim = payrollItemMasterRepository.findByItemName("직책수당");
+            PayrollDetail dutyPd = PayrollDetail
+                    .builder()
+                    .payroll(savedPayroll)
+                    .payrollItemMaster(dutyPim)
+                    .itemNameSnapshot("직책수당")
+                    .itemTypeCodeSnapshot("PAY")
+                    .amount(request.getDutyAllowance())
+                    .build();
+
+            payrollDetailRepository.saveAll(List.of(basicPd, responsibilityPd, mealPd, transportationPd, dutyPd));
 
             return Map.of("결과", "성공");
         }
@@ -202,5 +241,171 @@ public class PayrollService {
         }
 
         return Map.of("결과", "실패");
+    }
+
+    public List<PaymentPayrollResponse> getPaymentList(PaymentPayrollRequest request) {
+        LocalDate baseDate = request.getApplyDate() != null ? request.getApplyDate() : LocalDate.now();
+        int yearMonth = Integer.parseInt(String.format("%d%02d", baseDate.getYear(), baseDate.getMonthValue()));
+
+        List<PaymentPayrollResponse> list = payrollMapper.getPaymentList(request, yearMonth);
+
+        for (PaymentPayrollResponse item : list) {
+            int totalPay = item.getBasicSalaryAmount()
+                    + item.getMealAllowanceAmount()
+                    + item.getTransportationAllowanceAmount()
+                    + item.getOvertimeAllowanceAmount();
+
+            int nationalPension = (int) Math.round(totalPay * NATIONAL_PENSION_RATE);
+            int healthInsurance = (int) Math.round(totalPay * HEALTH_INSURANCE_RATE);
+            int employmentInsurance = (int) Math.round(totalPay * EMPLOYMENT_INSURANCE_RATE);
+            int incomeTax = (int) Math.round(totalPay * INCOME_TAX_RATE);
+            int totalDeduction = nationalPension + healthInsurance + employmentInsurance + incomeTax;
+
+            item.setTotalPayAmount(totalPay);
+            item.setNationalPensionAmount(nationalPension);
+            item.setHealthInsuranceAmount(healthInsurance);
+            item.setEmploymentInsuranceAmount(employmentInsurance);
+            item.setIncomeTaxAmount(incomeTax);
+            item.setTotalDeductionAmount(totalDeduction);
+            item.setRealPayAmount(totalPay - totalDeduction);
+
+            item.setPayrollStatusText(item.getPayrollStatusCode() != null ? item.getPayrollStatusCode().getText() : null);
+
+            String notConfirmableReason = getNotConfirmableReason(item.getPayrollStatusCode(), item.getPaymentDate());
+            item.setConfirmable(notConfirmableReason == null);
+            item.setNotConfirmableReason(notConfirmableReason);
+        }
+
+        return list;
+    }
+
+    private String getNotConfirmableReason(PayrollStatusCode statusCode, LocalDate paymentDate) {
+        if (statusCode == PayrollStatusCode.CONFIRMED || statusCode == PayrollStatusCode.PAID) {
+            return "이미 확정된 급여입니다.";
+        }
+        if (statusCode == PayrollStatusCode.CANCELED) {
+            return "취소된 급여입니다.";
+        }
+        if (paymentDate == null) {
+            return "지급일이 설정되지 않았습니다.";
+        }
+
+        LocalDate windowStart = paymentDate.minusDays(confirmWindowDays);
+        LocalDate windowEnd = paymentDate.minusDays(1);
+        LocalDate today = LocalDate.now();
+
+        if (today.isBefore(windowStart) || today.isAfter(windowEnd)) {
+            return String.format(
+                    "확정 가능 기간이 아닙니다. (지급일 %d일 전인 %s부터 %s까지 확정 가능)",
+                    confirmWindowDays, windowStart, windowEnd
+            );
+        }
+
+        return null;
+    }
+
+    public ConfirmPayrollResponse confirmPayroll(ConfirmPayrollRequest request) {
+        List<Long> payrollIds = request.getPayrollIds();
+        List<Map<String, Object>> failed = new ArrayList<>();
+        int confirmedCount = 0;
+
+        for (Long payrollId : payrollIds) {
+            Payroll payroll = payrollRepository.findById(payrollId).orElse(null);
+
+            if (payroll == null) {
+                failed.add(Map.of("payrollId", payrollId, "reason", "존재하지 않는 급여명세입니다."));
+                continue;
+            }
+
+            String notConfirmableReason = getNotConfirmableReason(payroll.getPayrollStatusCode(), payroll.getPaymentDate());
+            if (notConfirmableReason != null) {
+                failed.add(Map.of("payrollId", payrollId, "reason", notConfirmableReason));
+                continue;
+            }
+
+            payroll.setPayrollStatusCode(PayrollStatusCode.CONFIRMED);
+            payrollRepository.save(payroll);
+            confirmedCount++;
+        }
+
+        return new ConfirmPayrollResponse(confirmedCount, failed);
+    }
+
+    public PayrollTrendResponse getTrend(int year, Authentication authentication) {
+        Employee employee = employeeRepository.findByEmail(authentication.getName())
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사원입니다."));
+
+        int yearStart = year * 100 + 1;
+        int yearEnd = year * 100 + 12;
+
+        List<PayrollTrendMonthItem> raw = payrollMapper.getTrendRaw(employee.getEmployeeId(), yearStart, yearEnd);
+
+        Map<Integer, PayrollTrendMonthItem> byMonth = new HashMap<>();
+        for (PayrollTrendMonthItem item : raw) {
+            byMonth.put(item.getPayrollYearMonth() % 100, item);
+        }
+
+        List<PayrollTrendMonthItem> monthlyList = new ArrayList<>();
+        for (int month = 1; month <= 12; month++) {
+            PayrollTrendMonthItem item = byMonth.get(month);
+
+            if (item == null) {
+                item = new PayrollTrendMonthItem();
+                item.setMonth(month);
+                item.setHasData(false);
+            } else {
+                item.setMonth(month);
+                item.setHasData(true);
+
+                int totalPay = item.getBasicSalaryAmount() + item.getTotalAllowanceAmount();
+                int nationalPension = (int) Math.round(totalPay * NATIONAL_PENSION_RATE);
+                int healthInsurance = (int) Math.round(totalPay * HEALTH_INSURANCE_RATE);
+                int employmentInsurance = (int) Math.round(totalPay * EMPLOYMENT_INSURANCE_RATE);
+                int incomeTax = (int) Math.round(totalPay * INCOME_TAX_RATE);
+                int deduction = nationalPension + healthInsurance + employmentInsurance + incomeTax;
+
+                item.setTotalPayAmount(totalPay);
+                item.setNationalPensionAmount(nationalPension);
+                item.setHealthInsuranceAmount(healthInsurance);
+                item.setEmploymentInsuranceAmount(employmentInsurance);
+                item.setIncomeTaxAmount(incomeTax);
+                item.setTotalDeductionAmount(deduction);
+                item.setRealPayAmount(totalPay - deduction);
+                item.setPayrollStatusText(item.getPayrollStatusCode() != null ? item.getPayrollStatusCode().getText() : null);
+            }
+
+            monthlyList.add(item);
+        }
+
+        return new PayrollTrendResponse(
+                employee.getEmployeeNo(),
+                employee.getName(),
+                employee.getDepartment().getDepartmentName(),
+                employee.getPosition().getPositionName(),
+                year,
+                monthlyList
+        );
+    }
+
+    public List<PayrollHistoryItem> getHistory(String employeeNo) {
+        List<PayrollHistoryItem> list = payrollMapper.getHistory(employeeNo);
+
+        for (PayrollHistoryItem item : list) {
+            item.setTotalAllowanceAmount(
+                    item.getMealAllowanceAmount()
+                            + item.getTransportationAllowanceAmount()
+                            + item.getPositionAllowanceAmount()
+            );
+            item.setPayrollStatusText(item.getPayrollStatusCode() != null ? item.getPayrollStatusCode().getText() : null);
+        }
+
+        return list;
+    }
+
+    public List<BasicSalaryHistoryResponse> getBasicSalaryHistory(String employeeNo) {
+        return payrollBasicSalaryHistoryRepository.findByEmployeeNoOrderByCreatedAtDesc(employeeNo)
+                .stream()
+                .map(h -> new BasicSalaryHistoryResponse(h.getCreatedAt(), h.getOldAmount(), h.getNewAmount()))
+                .toList();
     }
 }

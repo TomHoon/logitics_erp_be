@@ -57,4 +57,8 @@ public class Payroll extends BaseEntity {
 	@Column(length = 100)
 	private String positionNameSnapshot;
 
+	public void setPayrollStatusCode(PayrollStatusCode payrollStatusCode) {
+		this.payrollStatusCode = payrollStatusCode;
+	}
+
 }

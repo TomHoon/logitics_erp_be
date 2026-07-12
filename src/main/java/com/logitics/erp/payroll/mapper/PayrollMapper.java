@@ -21,4 +21,10 @@ public interface PayrollMapper {
     int updateSalary(RegisterSalaryRequest request);
 
     int findPayrollCurrent(Long employeeId, int payrollYearMonth);
+
+    List<PaymentPayrollResponse> getPaymentList(PaymentPayrollRequest request, int yearMonth);
+
+    List<PayrollTrendMonthItem> getTrendRaw(Long employeeId, int yearStart, int yearEnd);
+
+    List<PayrollHistoryItem> getHistory(String employeeNo);
 }
