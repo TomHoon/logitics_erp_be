@@ -24,8 +24,9 @@ public class JwtFilter extends OncePerRequestFilter {
             "/api/v1/employees/login",
             "/api/v1/employees/logout",
             "/api/v1/employees/joinErp",
+            "/api/v1/employees/oauth/add-info",
             "/api/v1/employees/oauth/kakao",
-            "/api/v1/employees/oauth/add-info"
+            "/api/v1/transport/test/routes"
     );
 
 	@Override

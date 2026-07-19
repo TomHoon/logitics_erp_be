@@ -40,6 +40,7 @@ public class SecurityConfig {
 														"/api/v1/employees/oauth/add-info",
 														"/api/v1/employees/logout",
                                                         "/api/v1/employees/joinErp",
+                                                        "/api/v1/transport/test/routes",
 														"/swagger-ui/**",
 														"/v3/api-docs/**",
 														"/swagger-ui.html"
