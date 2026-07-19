@@ -32,7 +32,7 @@ public class KakaoRouteService {
                         .build())
                 .header(
                         "Authorization",
-                        "KakaoAK " + "3d188efa02077ebb4bc7b0c7ee6187f9"
+                        "KakaoAK " + restApiKey
                 )
                 .retrieve()
                 .body(KakaoRouteResponse.class);

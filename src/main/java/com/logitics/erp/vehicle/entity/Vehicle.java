@@ -2,10 +2,7 @@ package com.logitics.erp.vehicle.entity;
 
 import com.logitics.erp.common.entity.BaseEntity;
 import jakarta.persistence.*;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
+import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -13,6 +10,8 @@ import java.time.LocalDateTime;
 @Entity
 @Getter
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class Vehicle extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
