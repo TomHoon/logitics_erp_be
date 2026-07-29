@@ -146,7 +146,7 @@ public class AttendanceService {
 			throw new IllegalArgumentException("[ERR-CHECKOUT-002] 퇴근시간 20분 전 부터 퇴근처리가 가능합니다.");
 		}
 
-		employeeAttendance.setAttendanceStatusCode("퇴근");
+//		employeeAttendance.setAttendanceStatusCode("퇴근");
 
 		Attendance savedAttendance = attendanceRepository.save(employeeAttendance);
 
