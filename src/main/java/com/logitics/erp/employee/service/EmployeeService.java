@@ -154,14 +154,14 @@ public class EmployeeService {
         }
 
         // 4. 은행계좌, 은행명 비어있는지 확인
-        if (
-                registerEmployeeRequest.getAccountNumber() == null
-                        || registerEmployeeRequest.getAccountNumber() == ""
-                        || registerEmployeeRequest.getBankName() == null
-                        || registerEmployeeRequest.getBankName() == ""
-        ) {
-            throw new IllegalArgumentException("은행 정보가 올바르지 않습니다.");
-        }
+//        if (
+//                registerEmployeeRequest.getAccountNumber() == null
+//                        || registerEmployeeRequest.getAccountNumber() == ""
+//                        || registerEmployeeRequest.getBankName() == null
+//                        || registerEmployeeRequest.getBankName() == ""
+//        ) {
+//            throw new IllegalArgumentException("은행 정보가 올바르지 않습니다.");
+//        }
 
         // 5. 나머지 처리
         Long lastEmployeeNo = employeeRepository.findAll().getLast().getEmployeeId();
