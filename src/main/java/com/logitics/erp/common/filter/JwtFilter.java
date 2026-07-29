@@ -26,7 +26,9 @@ public class JwtFilter extends OncePerRequestFilter {
             "/api/v1/employees/joinErp",
             "/api/v1/employees/oauth/add-info",
             "/api/v1/employees/oauth/kakao",
-            "/api/v1/transport/test/routes"
+            "/api/v1/transport/test/routes",
+			"/swagger-ui/index.html",
+			"/v3/api-docs"
     );
 
 	@Override
@@ -37,8 +39,9 @@ public class JwtFilter extends OncePerRequestFilter {
 
         String path = request.getRequestURI();
 
+
         // 로그인 요청은 토큰 검사 제외
-        if (EXCLUDE_PATHS.contains(path)) {
+        if (EXCLUDE_PATHS.contains(path) || path.contains("swagger")) {
             filterChain.doFilter(request, response);
             return;
         }
